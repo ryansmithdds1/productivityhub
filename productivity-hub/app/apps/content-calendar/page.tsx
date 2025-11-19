@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { ArrowLeft, Plus, ChevronLeft, ChevronRight, Calendar as CalendarIcon, Table, Grid3x3 } from 'lucide-react';
+import { ArrowLeft, Plus, ChevronLeft, ChevronRight, Calendar as CalendarIcon, Table, Grid3x3, ListTodo } from 'lucide-react';
 import Link from 'next/link';
 import { storage, createDefaultNewsletter } from './lib/storage';
 import { getWeekStart, formatWeekRange } from './lib/utils';
@@ -9,6 +9,7 @@ import { ProgressBars } from './components/ProgressBars';
 import { ContentCard } from './components/ContentCard';
 import { BulkAddModal } from './components/BulkAddModal';
 import { MonthView } from './components/MonthView';
+import { NextUpView } from './components/NextUpView';
 import type { Content, Short, YouTubeVideo, Newsletter } from './types';
 
 export default function ContentCalendarApp() {
@@ -16,7 +17,7 @@ export default function ContentCalendarApp() {
     const [currentWeekStart, setCurrentWeekStart] = useState(getWeekStart());
     const [showAddMenu, setShowAddMenu] = useState(false);
     const [showBulkAdd, setShowBulkAdd] = useState(false);
-    const [viewMode, setViewMode] = useState<'week' | 'month'>('week');
+    const [viewMode, setViewMode] = useState<'week' | 'month' | 'next-up'>('week');
     const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
     const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
 
@@ -155,12 +156,22 @@ export default function ContentCalendarApp() {
                             <button
                                 onClick={() => setViewMode('month')}
                                 className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all flex items-center gap-1 ${viewMode === 'month'
-                                    ? 'bg-blue-500 text-white'
-                                    : 'text-gray-400 hover:text-gray-200'
+                                        ? 'bg-blue-500 text-white'
+                                        : 'text-gray-400 hover:text-gray-200'
                                     }`}
                             >
                                 <Grid3x3 size={16} />
                                 Month
+                            </button>
+                            <button
+                                onClick={() => setViewMode('next-up')}
+                                className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all flex items-center gap-1 ${viewMode === 'next-up'
+                                        ? 'bg-blue-500 text-white'
+                                        : 'text-gray-400 hover:text-gray-200'
+                                    }`}
+                            >
+                                <ListTodo size={16} />
+                                Next Up
                             </button>
                         </div>
 
@@ -258,6 +269,14 @@ export default function ContentCalendarApp() {
                                 setCurrentWeekStart(getWeekStart(date));
                                 setViewMode('week');
                             }}
+                        />
+                    </div>
+                ) : viewMode === 'next-up' ? (
+                    <div className="mt-8">
+                        <NextUpView
+                            content={content}
+                            onUpdate={handleUpdate}
+                            onDelete={handleDelete}
                         />
                     </div>
                 ) : (

@@ -110,6 +110,14 @@ export function BulkAddModal({ isOpen, onClose, onSaved, weekStart }: BulkAddMod
                         dueDate,
                         createdAt: currentTime,
                         updatedAt: currentTime,
+                        checklist: {
+                            scriptCreated: false,
+                            filmed: false,
+                            edited: false,
+                            thumbnailCreated: false,
+                            descriptionWritten: false,
+                            scheduled: false,
+                        },
                     };
                     storage.saveContent(newShort);
                 }
@@ -131,6 +139,14 @@ export function BulkAddModal({ isOpen, onClose, onSaved, weekStart }: BulkAddMod
                         thumbnailStatus: 'none',
                         createdAt: currentTime,
                         updatedAt: currentTime,
+                        checklist: {
+                            scriptCreated: false,
+                            filmed: false,
+                            edited: false,
+                            thumbnailCreated: false,
+                            descriptionWritten: false,
+                            scheduled: false,
+                        },
                     };
                     storage.saveContent(newVideo);
                 }
@@ -188,8 +204,8 @@ export function BulkAddModal({ isOpen, onClose, onSaved, weekStart }: BulkAddMod
                             key={idx}
                             onClick={() => setCurrentWeekIndex(idx)}
                             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${currentWeekIndex === idx
-                                    ? 'bg-blue-500 text-white'
-                                    : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                                ? 'bg-blue-500 text-white'
+                                : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
                                 }`}
                         >
                             {getWeekLabel(idx)}

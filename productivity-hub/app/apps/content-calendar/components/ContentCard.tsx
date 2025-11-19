@@ -16,8 +16,8 @@ export function ContentCard({ content, onUpdate, onDelete }: ContentCardProps) {
         scripted: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20',
         filmed: 'bg-orange-500/10 text-orange-400 border-orange-500/20',
         edited: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
-        scheduled: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20',
-        posted: 'bg-green-500/10 text-green-400 border-green-500/20',
+        ready: 'bg-green-500/10 text-green-400 border-green-500/20',
+        posted: 'bg-green-600/10 text-green-300 border-green-600/20',
     };
 
     const typeColors = {
@@ -56,9 +56,14 @@ export function ContentCard({ content, onUpdate, onDelete }: ContentCardProps) {
                 </div>
                 <div className="flex gap-2">
                     <button
-                        onClick={() => handleStatusChange(content.status === 'posted' ? 'idea' : 'posted')}
+                        onClick={() => {
+                            const statuses: Status[] = ['idea', 'scripted', 'filmed', 'edited', 'ready', 'posted'];
+                            const currentIndex = statuses.indexOf(content.status);
+                            const nextStatus = statuses[(currentIndex + 1) % statuses.length];
+                            handleStatusChange(nextStatus);
+                        }}
                         className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
-                        title={content.status === 'posted' ? 'Mark incomplete' : 'Mark complete'}
+                        title={`Current status: ${content.status}. Click to advance.`}
                     >
                         <CheckCircle
                             size={18}
@@ -112,6 +117,121 @@ export function ContentCard({ content, onUpdate, onDelete }: ContentCardProps) {
                         <span className="text-purple-300">
                             Linked to HookPoint script
                         </span>
+                    </div>
+                )}
+
+                {(content.type === 'short' || content.type === 'youtube') && content.checklist && (
+                    <div className="mt-3">
+                        <div className="text-xs font-medium text-gray-500 mb-2">Production Checklist:</div>
+                        <div className="grid grid-cols-2 gap-2">
+                            <button
+                                onClick={() => {
+                                    const newChecklist = { ...content.checklist!, scriptCreated: !content.checklist!.scriptCreated };
+                                    let newStatus = content.status;
+                                    if (newChecklist.scriptCreated && content.status === 'idea') newStatus = 'scripted';
+                                    onUpdate({ ...content, checklist: newChecklist, status: newStatus });
+                                }}
+                                className={cn(
+                                    "flex items-center gap-2 px-2 py-1.5 rounded text-xs transition-colors border",
+                                    content.checklist.scriptCreated
+                                        ? "bg-green-500/20 border-green-500/30 text-green-300"
+                                        : "bg-gray-800 border-gray-700 text-gray-400 hover:bg-gray-750"
+                                )}
+                            >
+                                <div className={cn("w-3 h-3 rounded-full border", content.checklist.scriptCreated ? "bg-green-400 border-green-400" : "border-gray-500")} />
+                                Script
+                            </button>
+
+                            <button
+                                onClick={() => {
+                                    const newChecklist = { ...content.checklist!, filmed: !content.checklist!.filmed };
+                                    let newStatus = content.status;
+                                    if (newChecklist.filmed && (content.status === 'idea' || content.status === 'scripted')) newStatus = 'filmed';
+                                    onUpdate({ ...content, checklist: newChecklist, status: newStatus });
+                                }}
+                                className={cn(
+                                    "flex items-center gap-2 px-2 py-1.5 rounded text-xs transition-colors border",
+                                    content.checklist.filmed
+                                        ? "bg-green-500/20 border-green-500/30 text-green-300"
+                                        : "bg-gray-800 border-gray-700 text-gray-400 hover:bg-gray-750"
+                                )}
+                            >
+                                <div className={cn("w-3 h-3 rounded-full border", content.checklist.filmed ? "bg-green-400 border-green-400" : "border-gray-500")} />
+                                Filmed
+                            </button>
+
+                            <button
+                                onClick={() => {
+                                    const newChecklist = { ...content.checklist!, edited: !content.checklist!.edited };
+                                    let newStatus = content.status;
+                                    if (newChecklist.edited && ['idea', 'scripted', 'filmed'].includes(content.status)) newStatus = 'edited';
+                                    onUpdate({ ...content, checklist: newChecklist, status: newStatus });
+                                }}
+                                className={cn(
+                                    "flex items-center gap-2 px-2 py-1.5 rounded text-xs transition-colors border",
+                                    content.checklist.edited
+                                        ? "bg-green-500/20 border-green-500/30 text-green-300"
+                                        : "bg-gray-800 border-gray-700 text-gray-400 hover:bg-gray-750"
+                                )}
+                            >
+                                <div className={cn("w-3 h-3 rounded-full border", content.checklist.edited ? "bg-green-400 border-green-400" : "border-gray-500")} />
+                                Edited
+                            </button>
+
+                            <button
+                                onClick={() => {
+                                    const newChecklist = { ...content.checklist!, thumbnailCreated: !content.checklist!.thumbnailCreated };
+                                    let newStatus = content.status;
+                                    if (newChecklist.thumbnailCreated && newChecklist.descriptionWritten && ['idea', 'scripted', 'filmed', 'edited'].includes(content.status)) newStatus = 'ready';
+                                    onUpdate({ ...content, checklist: newChecklist, status: newStatus });
+                                }}
+                                className={cn(
+                                    "flex items-center gap-2 px-2 py-1.5 rounded text-xs transition-colors border",
+                                    content.checklist.thumbnailCreated
+                                        ? "bg-green-500/20 border-green-500/30 text-green-300"
+                                        : "bg-gray-800 border-gray-700 text-gray-400 hover:bg-gray-750"
+                                )}
+                            >
+                                <div className={cn("w-3 h-3 rounded-full border", content.checklist.thumbnailCreated ? "bg-green-400 border-green-400" : "border-gray-500")} />
+                                Thumb
+                            </button>
+
+                            <button
+                                onClick={() => {
+                                    const newChecklist = { ...content.checklist!, descriptionWritten: !content.checklist!.descriptionWritten };
+                                    let newStatus = content.status;
+                                    if (newChecklist.thumbnailCreated && newChecklist.descriptionWritten && ['idea', 'scripted', 'filmed', 'edited'].includes(content.status)) newStatus = 'ready';
+                                    onUpdate({ ...content, checklist: newChecklist, status: newStatus });
+                                }}
+                                className={cn(
+                                    "flex items-center gap-2 px-2 py-1.5 rounded text-xs transition-colors border",
+                                    content.checklist.descriptionWritten
+                                        ? "bg-green-500/20 border-green-500/30 text-green-300"
+                                        : "bg-gray-800 border-gray-700 text-gray-400 hover:bg-gray-750"
+                                )}
+                            >
+                                <div className={cn("w-3 h-3 rounded-full border", content.checklist.descriptionWritten ? "bg-green-400 border-green-400" : "border-gray-500")} />
+                                Desc
+                            </button>
+
+                            <button
+                                onClick={() => {
+                                    const newChecklist = { ...content.checklist!, scheduled: !content.checklist!.scheduled };
+                                    let newStatus = content.status;
+                                    if (newChecklist.scheduled) newStatus = 'posted';
+                                    onUpdate({ ...content, checklist: newChecklist, status: newStatus });
+                                }}
+                                className={cn(
+                                    "flex items-center gap-2 px-2 py-1.5 rounded text-xs transition-colors border",
+                                    content.checklist.scheduled
+                                        ? "bg-green-500/20 border-green-500/30 text-green-300"
+                                        : "bg-gray-800 border-gray-700 text-gray-400 hover:bg-gray-750"
+                                )}
+                            >
+                                <div className={cn("w-3 h-3 rounded-full border", content.checklist.scheduled ? "bg-green-400 border-green-400" : "border-gray-500")} />
+                                Posted
+                            </button>
+                        </div>
                     </div>
                 )}
 
