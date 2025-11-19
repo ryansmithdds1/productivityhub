@@ -8,6 +8,7 @@ import { LogOut } from 'lucide-react';
 
 import { YouTubeStats } from '@/app/components/YouTubeStats';
 import { SocialStatCard } from '@/app/components/SocialStatCard';
+import { YouTubeLatestVideos } from '@/app/components/YouTubeLatestVideos';
 import { Instagram, Music2 } from 'lucide-react';
 
 export default async function DashboardPage() {
@@ -40,7 +41,7 @@ export default async function DashboardPage() {
             {/* Main Content */}
             <main className="max-w-7xl mx-auto px-6 py-12">
                 {/* Social Stats Grid */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                     <YouTubeStats
                         channelId="UCH8ogybb7nap82QuKpnpbZg"
                         apiKey="AIzaSyC8OSuZfHmCrjbH8RIPG-fM7Oq1kho7q_4"
@@ -50,18 +51,26 @@ export default async function DashboardPage() {
                         <SocialStatCard
                             platform="instagram"
                             username="ryansmithdds"
-                            followers="12.5K"
+                            initialFollowers="12.5K"
                             color="text-pink-500"
                             icon={Instagram}
                         />
                         <SocialStatCard
                             platform="tiktok"
                             username="ryansmithdds"
-                            followers="45.2K"
+                            initialFollowers="45.2K"
                             color="text-cyan-400"
                             icon={Music2}
                         />
                     </div>
+                </div>
+
+                {/* Latest Videos */}
+                <div className="mb-12">
+                    <YouTubeLatestVideos
+                        channelId="UCH8ogybb7nap82QuKpnpbZg"
+                        apiKey="AIzaSyC8OSuZfHmCrjbH8RIPG-fM7Oq1kho7q_4"
+                    />
                 </div>
 
                 <div className="mb-8">
