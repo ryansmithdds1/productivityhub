@@ -6,9 +6,10 @@ import { cn } from '../lib/utils';
 
 interface HookLibraryProps {
     onSelectHook: (hookText: string, category: ScriptCategory) => void;
+    onBack: () => void;
 }
 
-export function HookLibrary({ onSelectHook }: HookLibraryProps) {
+export function HookLibrary({ onSelectHook, onBack }: HookLibraryProps) {
     const [selectedCategory, setSelectedCategory] = useState<ScriptCategory | 'all'>('all');
 
     const categories: { value: ScriptCategory | 'all'; label: string }[] = [
