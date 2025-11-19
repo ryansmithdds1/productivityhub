@@ -13,6 +13,16 @@ export interface App {
 
 export const apps: App[] = [
     {
+        id: 'todo',
+        name: 'To-Do List',
+        description: 'Time-blocking task manager with recurring tasks',
+        icon: Calendar,
+        route: '/apps/todo',
+        category: 'productivity',
+        color: 'text-orange-400',
+        gradient: 'from-orange-500/10 to-orange-600/5 border-orange-500/20',
+    },
+    {
         id: 'hookpoint',
         name: 'Short Video Creator',
         description: 'Plan viral short-form video scripts with AI-powered hooks',

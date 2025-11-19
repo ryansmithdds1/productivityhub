@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Calendar, Zap, Lightbulb, Stethoscope, Bot, Settings, User, LogOut } from 'lucide-react';
+import { LayoutDashboard, Calendar, Zap, Lightbulb, Stethoscope, Bot, Settings, User, LogOut, ListTodo } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface NavItem {
@@ -15,6 +15,7 @@ interface NavItem {
 
 const navItems: NavItem[] = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+    { name: 'To-Do List', href: '/apps/todo', icon: ListTodo },
     { name: 'Content Calendar', href: '/apps/content-calendar', icon: Calendar },
     { name: 'Short Video Creator', href: '/apps/hookpoint', icon: Zap },
     { name: 'Idea Brainstorm', href: '/apps/ideas', icon: Lightbulb, badge: 'Soon', disabled: true },
