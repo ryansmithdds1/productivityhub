@@ -35,12 +35,15 @@ export function TaskCard({ task, compact = false, onUpdate }: TaskCardProps) {
         const startDuration = task.timeBlock.duration;
 
         const handleMouseMove = (moveEvent: MouseEvent) => {
+            moveEvent.preventDefault();
+            moveEvent.stopPropagation();
+
             const deltaY = moveEvent.clientY - startY;
             // Each 40px = 15 minutes (approximate grid cell height)
             const durationChange = Math.round(deltaY / 40) * 15;
             const newDuration = Math.max(15, Math.min(180, startDuration + durationChange));
 
-            if (newDuration !== task.timeBlock?.duration) {
+            if (newDuration !== startDuration) {
                 const updatedTask = {
                     ...task,
                     timeBlock: {
@@ -53,7 +56,9 @@ export function TaskCard({ task, compact = false, onUpdate }: TaskCardProps) {
             }
         };
 
-        const handleMouseUp = () => {
+        const handleMouseUp = (upEvent: MouseEvent) => {
+            upEvent.preventDefault();
+            upEvent.stopPropagation();
             setIsResizing(false);
             document.removeEventListener('mousemove', handleMouseMove);
             document.removeEventListener('mouseup', handleMouseUp);
