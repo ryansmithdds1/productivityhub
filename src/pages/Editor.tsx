@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Save, Sparkles, Wand2, ArrowLeft, Trash2, Play, Check, Loader2 } from 'lucide-react';
 import { storage } from '../lib/storage';
 import { GeminiService } from '../lib/gemini';
