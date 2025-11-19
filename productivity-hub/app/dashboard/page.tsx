@@ -6,6 +6,8 @@ import { apps } from '@/lib/apps-registry';
 import Link from 'next/link';
 import { LogOut } from 'lucide-react';
 
+import { YouTubeStats } from '@/app/components/YouTubeStats';
+
 export default async function DashboardPage() {
     const session = await getServerSession(authOptions);
 
@@ -35,6 +37,14 @@ export default async function DashboardPage() {
 
             {/* Main Content */}
             <main className="max-w-7xl mx-auto px-6 py-12">
+                {/* YouTube Stats */}
+                <div className="mb-12">
+                    <YouTubeStats
+                        channelId="UCH8ogybb7nap82QuKpnpbZg"
+                        apiKey="AIzaSyC8OSuZfHmCrjbH8RIPG-fM7Oq1kho7q_4"
+                    />
+                </div>
+
                 <div className="mb-8">
                     <h2 className="text-3xl font-bold text-white mb-2">Your Apps</h2>
                     <p className="text-gray-400">Select an app to get started</p>
