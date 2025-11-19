@@ -59,7 +59,7 @@ export default function HookPointApp() {
                         <div className="flex items-center gap-2">
                             <Zap className="text-purple-400" size={24} />
                             <h1 className="text-2xl font-bold text-white">
-                                HookPoint
+                                Short Video Creator
                             </h1>
                         </div>
                         <p className="text-sm text-gray-400 mt-1">AI-powered viral script creator</p>

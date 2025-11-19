@@ -16,7 +16,7 @@ interface NavItem {
 const navItems: NavItem[] = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
     { name: 'Content Calendar', href: '/apps/content-calendar', icon: Calendar },
-    { name: 'HookPoint', href: '/apps/hookpoint', icon: Zap },
+    { name: 'Short Video Creator', href: '/apps/hookpoint', icon: Zap },
     { name: 'Idea Brainstorm', href: '/apps/ideas', icon: Lightbulb, badge: 'Soon', disabled: true },
     { name: 'Practice Manager', href: '/apps/practice', icon: Stethoscope, badge: 'Soon', disabled: true },
     { name: 'AI Assistant', href: '/apps/ai-assistant', icon: Bot, badge: 'Soon', disabled: true },

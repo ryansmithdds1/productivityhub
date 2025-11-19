@@ -14,7 +14,7 @@ export interface App {
 export const apps: App[] = [
     {
         id: 'hookpoint',
-        name: 'HookPoint',
+        name: 'Short Video Creator',
         description: 'Plan viral short-form video scripts with AI-powered hooks',
         icon: Video,
         route: '/apps/hookpoint',
