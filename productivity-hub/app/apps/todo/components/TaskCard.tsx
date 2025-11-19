@@ -39,8 +39,9 @@ export function TaskCard({ task, compact = false, onUpdate }: TaskCardProps) {
             moveEvent.stopPropagation();
 
             const deltaY = moveEvent.clientY - startY;
-            // Each 40px = 15 minutes (approximate grid cell height)
-            const durationChange = Math.round(deltaY / 40) * 15;
+            // Each 80px = 60 minutes (DayPlanner HOUR_HEIGHT)
+            // So 20px = 15 minutes
+            const durationChange = Math.round(deltaY / 20) * 15;
             const newDuration = Math.max(15, Math.min(180, startDuration + durationChange));
 
             if (newDuration !== startDuration) {
@@ -68,15 +69,9 @@ export function TaskCard({ task, compact = false, onUpdate }: TaskCardProps) {
         document.addEventListener('mouseup', handleMouseUp);
     };
 
-    const PIXELS_PER_MINUTE = 40 / 15; // 2.66px per minute
-    const height = task.timeBlock && !compact
-        ? Math.max(40, task.timeBlock.duration * PIXELS_PER_MINUTE)
-        : undefined;
-
     return (
         <div
-            style={height ? { height: `${height}px` } : undefined}
-            className={`border rounded-lg p-3 pb-5 transition-all relative ${getCategoryColor(task.category)} ${compact ? 'text-sm' : ''
+            className={`border rounded-lg p-3 pb-5 transition-all relative ${getCategoryColor(task.category)} ${compact ? 'text-sm' : 'h-full'
                 } ${task.completed ? 'opacity-50' : ''} ${isResizing ? 'ring-2 ring-orange-500 z-10' : ''}`}
         >
             <div className="flex items-start gap-2 h-full overflow-hidden">
@@ -108,7 +103,7 @@ export function TaskCard({ task, compact = false, onUpdate }: TaskCardProps) {
                         </div>
                     )}
 
-                    {task.description && !compact && height && height > 60 && (
+                    {task.description && !compact && task.timeBlock && task.timeBlock.duration > 45 && (
                         <p className="text-xs text-gray-500 mt-1 line-clamp-2">{task.description}</p>
                     )}
                 </div>
