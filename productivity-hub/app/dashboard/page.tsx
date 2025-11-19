@@ -9,7 +9,6 @@ import { LogOut } from 'lucide-react';
 import { YouTubeStats } from '@/app/components/YouTubeStats';
 import { SocialStatCard } from '@/app/components/SocialStatCard';
 import { YouTubeLatestVideos } from '@/app/components/YouTubeLatestVideos';
-import { Instagram, Music2 } from 'lucide-react';
 
 export default async function DashboardPage() {
     const session = await getServerSession(authOptions);
@@ -53,14 +52,12 @@ export default async function DashboardPage() {
                             username="ryansmithdds"
                             initialFollowers="12.5K"
                             color="text-pink-500"
-                            icon={Instagram}
                         />
                         <SocialStatCard
                             platform="tiktok"
                             username="ryansmithdds"
                             initialFollowers="45.2K"
                             color="text-cyan-400"
-                            icon={Music2}
                         />
                     </div>
                 </div>

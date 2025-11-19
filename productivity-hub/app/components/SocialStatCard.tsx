@@ -1,17 +1,17 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { LucideIcon, TrendingUp, Edit2, Check, X } from 'lucide-react';
+import { TrendingUp, Edit2, Check, X, Instagram, Music2 } from 'lucide-react';
 
 interface SocialStatCardProps {
     platform: 'tiktok' | 'instagram';
     username: string;
     initialFollowers: string;
     color: string;
-    icon: LucideIcon;
 }
 
-export function SocialStatCard({ platform, username, initialFollowers, color, icon: Icon }: SocialStatCardProps) {
+export function SocialStatCard({ platform, username, initialFollowers, color }: SocialStatCardProps) {
+    const Icon = platform === 'instagram' ? Instagram : Music2;
     const [followers, setFollowers] = useState(initialFollowers);
     const [isEditing, setIsEditing] = useState(false);
     const [editValue, setEditValue] = useState('');
