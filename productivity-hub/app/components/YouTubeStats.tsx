@@ -139,7 +139,7 @@ export function YouTubeStats({ channelId, apiKey: initialApiKey }: { channelId: 
                     <div className="p-2 bg-red-500/10 rounded-lg">
                         <TrendingUp className="text-red-400" size={24} />
                     </div>
-                    <h2 className="text-xl font-bold text-white">Channel Stats</h2>
+                    <h2 className="text-xl font-bold text-white">RyanSmithDDS YouTube Stats</h2>
                 </div>
                 <div className="flex items-center gap-3">
                     <div className="text-xs text-gray-500 flex items-center gap-1">
