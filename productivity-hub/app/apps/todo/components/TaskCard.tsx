@@ -65,7 +65,7 @@ export function TaskCard({ task, compact = false, onUpdate }: TaskCardProps) {
 
     return (
         <div
-            className={`border rounded-lg p-3 transition-all relative ${getCategoryColor(task.category)} ${compact ? 'text-sm' : ''
+            className={`border rounded-lg p-3 pb-5 transition-all relative ${getCategoryColor(task.category)} ${compact ? 'text-sm' : ''
                 } ${task.completed ? 'opacity-50' : ''} ${isResizing ? 'ring-2 ring-orange-500' : ''}`}
         >
             <div className="flex items-start gap-2">
@@ -106,10 +106,13 @@ export function TaskCard({ task, compact = false, onUpdate }: TaskCardProps) {
             {/* Resize Handle */}
             {task.timeBlock && !compact && (
                 <div
+                    draggable={false}
                     onMouseDown={handleResizeStart}
-                    className="absolute bottom-0 left-0 right-0 h-2 cursor-ns-resize flex items-center justify-center hover:bg-orange-500/20 transition-colors group"
+                    onDragStart={(e) => e.preventDefault()}
+                    className="absolute bottom-0 left-0 right-0 h-3 cursor-ns-resize flex items-center justify-center hover:bg-orange-500/30 transition-colors group border-t border-transparent hover:border-orange-500/50"
+                    title="Drag to resize duration"
                 >
-                    <GripHorizontal size={14} className="text-gray-600 group-hover:text-orange-400" />
+                    <GripHorizontal size={16} className="text-gray-600 group-hover:text-orange-400" />
                 </div>
             )}
         </div>
