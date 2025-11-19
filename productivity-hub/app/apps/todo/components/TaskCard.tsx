@@ -1,6 +1,7 @@
 'use client';
 
-import { Check, Circle, Clock, AlertCircle } from 'lucide-react';
+import { useState } from 'react';
+import { Check, Circle, Clock, AlertCircle, GripHorizontal } from 'lucide-react';
 import type { Task } from '../types';
 import { formatTimeBlock, getCategoryColor, getPriorityColor } from '../lib/utils';
 import { storage } from '../lib/storage';
@@ -12,6 +13,8 @@ interface TaskCardProps {
 }
 
 export function TaskCard({ task, compact = false, onUpdate }: TaskCardProps) {
+    const [isResizing, setIsResizing] = useState(false);
+
     const handleToggleComplete = () => {
         if (task.completed) {
             storage.uncompleteTask(task.id);
@@ -21,10 +24,49 @@ export function TaskCard({ task, compact = false, onUpdate }: TaskCardProps) {
         onUpdate();
     };
 
+    const handleResizeStart = (e: React.MouseEvent) => {
+        if (!task.timeBlock) return;
+
+        e.preventDefault();
+        e.stopPropagation();
+        setIsResizing(true);
+
+        const startY = e.clientY;
+        const startDuration = task.timeBlock.duration;
+
+        const handleMouseMove = (moveEvent: MouseEvent) => {
+            const deltaY = moveEvent.clientY - startY;
+            // Each 40px = 15 minutes (approximate grid cell height)
+            const durationChange = Math.round(deltaY / 40) * 15;
+            const newDuration = Math.max(15, Math.min(180, startDuration + durationChange));
+
+            if (newDuration !== task.timeBlock?.duration) {
+                const updatedTask = {
+                    ...task,
+                    timeBlock: {
+                        ...task.timeBlock!,
+                        duration: newDuration
+                    }
+                };
+                storage.saveTask(updatedTask);
+                onUpdate();
+            }
+        };
+
+        const handleMouseUp = () => {
+            setIsResizing(false);
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', handleMouseUp);
+        };
+
+        document.addEventListener('mousemove', handleMouseMove);
+        document.addEventListener('mouseup', handleMouseUp);
+    };
+
     return (
         <div
-            className={`border rounded-lg p-3 transition-all ${getCategoryColor(task.category)} ${compact ? 'text-sm' : ''
-                } ${task.completed ? 'opacity-50' : ''}`}
+            className={`border rounded-lg p-3 transition-all relative ${getCategoryColor(task.category)} ${compact ? 'text-sm' : ''
+                } ${task.completed ? 'opacity-50' : ''} ${isResizing ? 'ring-2 ring-orange-500' : ''}`}
         >
             <div className="flex items-start gap-2">
                 <button
@@ -60,6 +102,16 @@ export function TaskCard({ task, compact = false, onUpdate }: TaskCardProps) {
                     )}
                 </div>
             </div>
+
+            {/* Resize Handle */}
+            {task.timeBlock && !compact && (
+                <div
+                    onMouseDown={handleResizeStart}
+                    className="absolute bottom-0 left-0 right-0 h-2 cursor-ns-resize flex items-center justify-center hover:bg-orange-500/20 transition-colors group"
+                >
+                    <GripHorizontal size={14} className="text-gray-600 group-hover:text-orange-400" />
+                </div>
+            )}
         </div>
     );
 }
