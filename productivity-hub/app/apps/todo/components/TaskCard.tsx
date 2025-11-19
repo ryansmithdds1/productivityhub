@@ -68,15 +68,21 @@ export function TaskCard({ task, compact = false, onUpdate }: TaskCardProps) {
         document.addEventListener('mouseup', handleMouseUp);
     };
 
+    const PIXELS_PER_MINUTE = 40 / 15; // 2.66px per minute
+    const height = task.timeBlock && !compact
+        ? Math.max(40, task.timeBlock.duration * PIXELS_PER_MINUTE)
+        : undefined;
+
     return (
         <div
+            style={height ? { height: `${height}px` } : undefined}
             className={`border rounded-lg p-3 pb-5 transition-all relative ${getCategoryColor(task.category)} ${compact ? 'text-sm' : ''
-                } ${task.completed ? 'opacity-50' : ''} ${isResizing ? 'ring-2 ring-orange-500' : ''}`}
+                } ${task.completed ? 'opacity-50' : ''} ${isResizing ? 'ring-2 ring-orange-500 z-10' : ''}`}
         >
-            <div className="flex items-start gap-2">
+            <div className="flex items-start gap-2 h-full overflow-hidden">
                 <button
                     onClick={handleToggleComplete}
-                    className="mt-0.5 hover:scale-110 transition-transform"
+                    className="mt-0.5 hover:scale-110 transition-transform flex-shrink-0"
                 >
                     {task.completed ? (
                         <Check size={18} className="text-green-400" />
@@ -87,11 +93,11 @@ export function TaskCard({ task, compact = false, onUpdate }: TaskCardProps) {
 
                 <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-2">
-                        <p className={`font-medium ${task.completed ? 'line-through text-gray-500' : 'text-white'}`}>
+                        <p className={`font-medium ${task.completed ? 'line-through text-gray-500' : 'text-white'} truncate`}>
                             {task.title}
                         </p>
                         {task.priority === 'high' && (
-                            <AlertCircle size={16} className={getPriorityColor(task.priority)} />
+                            <AlertCircle size={16} className={`${getPriorityColor(task.priority)} flex-shrink-0`} />
                         )}
                     </div>
 
@@ -102,7 +108,7 @@ export function TaskCard({ task, compact = false, onUpdate }: TaskCardProps) {
                         </div>
                     )}
 
-                    {task.description && !compact && (
+                    {task.description && !compact && height && height > 60 && (
                         <p className="text-xs text-gray-500 mt-1 line-clamp-2">{task.description}</p>
                     )}
                 </div>
