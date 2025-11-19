@@ -25,7 +25,7 @@ export const apps: App[] = [
     {
         id: 'content-calendar',
         name: 'Content Calendar',
-        description: 'Manage your social media content schedule',
+        description: 'Track 7 weekly shorts, 3 YouTube videos, and newsletter sections',
         icon: Calendar,
         route: '/apps/content-calendar',
         category: 'content',
