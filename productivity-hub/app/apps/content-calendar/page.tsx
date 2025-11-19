@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { ArrowLeft, Plus, ChevronLeft, ChevronRight, Calendar as CalendarIcon, Table, Grid3x3, ListTodo } from 'lucide-react';
-import Link from 'next/link';
+import { Plus, ChevronLeft, ChevronRight, Calendar as CalendarIcon, Table, Grid3x3, ListTodo } from 'lucide-react';
+import { DashboardLayout } from '@/app/components/DashboardLayout';
 import { storage, createDefaultNewsletter } from './lib/storage';
 import { getWeekStart, formatWeekRange } from './lib/utils';
 import { ProgressBars } from './components/ProgressBars';
@@ -48,30 +48,49 @@ export default function ContentCalendarApp() {
         tomorrow.setDate(tomorrow.getDate() + 1);
         tomorrow.setHours(12, 0, 0, 0);
 
-        if (type === 'short') {
-            newContent = {
-                id: `short-${Date.now()}`,
-                type: 'short',
-                title: 'New Short',
-                platform: 'tiktok',
-                status: 'idea',
-                dueDate: tomorrow.getTime(),
-                createdAt: Date.now(),
-                updatedAt: Date.now(),
-            } as Short;
-        } else if (type === 'youtube') {
-            newContent = {
-                id: `youtube-${Date.now()}`,
-                type: 'youtube',
-                title: 'New YouTube Video',
-                status: 'idea',
-                dueDate: tomorrow.getTime(),
-                thumbnailStatus: 'none',
-                createdAt: Date.now(),
-                updatedAt: Date.now(),
-            } as YouTubeVideo;
-        } else {
-            newContent = createDefaultNewsletter(currentWeekStart);
+        switch (type) {
+            case 'short':
+                newContent = {
+                    id: crypto.randomUUID(),
+                    type: 'short',
+                    title: '',
+                    platform: 'tiktok',
+                    dueDate: tomorrow.getTime(),
+                    status: 'idea',
+                    createdAt: Date.now(),
+                    updatedAt: Date.now(),
+                    checklist: {
+                        scriptCreated: false,
+                        filmed: false,
+                        edited: false,
+                        thumbnailCreated: false,
+                        descriptionWritten: false,
+                        scheduled: false,
+                    },
+                };
+                break;
+            case 'youtube':
+                newContent = {
+                    id: crypto.randomUUID(),
+                    type: 'youtube',
+                    title: '',
+                    dueDate: tomorrow.getTime(),
+                    status: 'idea',
+                    createdAt: Date.now(),
+                    updatedAt: Date.now(),
+                    checklist: {
+                        scriptCreated: false,
+                        filmed: false,
+                        edited: false,
+                        thumbnailCreated: false,
+                        descriptionWritten: false,
+                        scheduled: false,
+                    },
+                };
+                break;
+            case 'newsletter':
+                newContent = createDefaultNewsletter(tomorrow.getTime());
+                break;
         }
 
         storage.saveContent(newContent);
@@ -94,18 +113,18 @@ export default function ContentCalendarApp() {
     const goToPreviousMonth = () => {
         if (currentMonth === 0) {
             setCurrentMonth(11);
-            setCurrentYear(prev => prev - 1);
+            setCurrentYear(currentYear - 1);
         } else {
-            setCurrentMonth(prev => prev - 1);
+            setCurrentMonth(currentMonth - 1);
         }
     };
 
     const goToNextMonth = () => {
         if (currentMonth === 11) {
             setCurrentMonth(0);
-            setCurrentYear(prev => prev + 1);
+            setCurrentYear(currentYear + 1);
         } else {
-            setCurrentMonth(prev => prev + 1);
+            setCurrentMonth(currentMonth + 1);
         }
     };
 
@@ -114,31 +133,22 @@ export default function ContentCalendarApp() {
     const newsletters = weekContent.filter(c => c.type === 'newsletter');
 
     return (
-        <div className="min-h-screen bg-gray-950">
+        <DashboardLayout>
             {/* Header */}
-            <div className="bg-gray-900 border-b border-gray-800 px-6 py-4">
-                <div className="max-w-7xl mx-auto flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                        <Link
-                            href="/dashboard"
-                            className="flex items-center gap-2 text-gray-400 hover:text-gray-200 transition-colors"
-                        >
-                            <ArrowLeft size={20} />
-                            <span>Back to Hub</span>
-                        </Link>
-                        <div className="h-6 w-px bg-gray-700" />
-                        <div className="flex items-center gap-2">
-                            <CalendarIcon className="text-blue-400" size={24} />
-                            <h1 className="text-xl font-bold bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
-                                Content Calendar
-                            </h1>
-                        </div>
+            <div className="bg-gray-900 border-b border-gray-800 sticky top-0 z-10">
+                <div className="px-8 py-6">
+                    <div className="flex items-center gap-2">
+                        <CalendarIcon className="text-blue-400" size={24} />
+                        <h1 className="text-2xl font-bold text-white">
+                            Content Calendar
+                        </h1>
                     </div>
+                    <p className="text-sm text-gray-400 mt-1">Plan and track your content production</p>
                 </div>
             </div>
 
             {/* Main Content */}
-            <div className="max-w-7xl mx-auto p-6">
+            <div className="p-8">
                 {/* View Toggle and Navigation */}
                 <div className="flex items-center justify-between mb-6">
                     <div className="flex items-center gap-4">
@@ -156,8 +166,8 @@ export default function ContentCalendarApp() {
                             <button
                                 onClick={() => setViewMode('month')}
                                 className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all flex items-center gap-1 ${viewMode === 'month'
-                                        ? 'bg-blue-500 text-white'
-                                        : 'text-gray-400 hover:text-gray-200'
+                                    ? 'bg-blue-500 text-white'
+                                    : 'text-gray-400 hover:text-gray-200'
                                     }`}
                             >
                                 <Grid3x3 size={16} />
@@ -166,8 +176,8 @@ export default function ContentCalendarApp() {
                             <button
                                 onClick={() => setViewMode('next-up')}
                                 className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all flex items-center gap-1 ${viewMode === 'next-up'
-                                        ? 'bg-blue-500 text-white'
-                                        : 'text-gray-400 hover:text-gray-200'
+                                    ? 'bg-blue-500 text-white'
+                                    : 'text-gray-400 hover:text-gray-200'
                                     }`}
                             >
                                 <ListTodo size={16} />
@@ -364,6 +374,6 @@ export default function ContentCalendarApp() {
                 }}
                 weekStart={currentWeekStart}
             />
-        </div>
+        </DashboardLayout>
     );
 }
