@@ -3,6 +3,7 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { redirect } from 'next/navigation';
 
 import { DashboardLayout } from '@/app/components/DashboardLayout';
+import { TodoDashboardWidget } from '@/app/components/TodoDashboardWidget';
 import { YouTubeStats } from '@/app/components/YouTubeStats';
 import { SocialStatCard } from '@/app/components/SocialStatCard';
 import { YouTubeLatestVideos } from '@/app/components/YouTubeLatestVideos';
@@ -26,6 +27,9 @@ export default async function DashboardPage() {
 
             {/* Main Content */}
             <div className="p-8 space-y-8">
+                {/* Today's Tasks */}
+                <TodoDashboardWidget />
+
                 {/* Social Stats Grid */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <YouTubeStats

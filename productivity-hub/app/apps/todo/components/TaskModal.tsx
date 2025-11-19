@@ -149,7 +149,7 @@ export function TaskModal({ isOpen, onClose, onSaved, task, defaultDate }: TaskM
                                     if (e.target.checked) {
                                         setFormData({
                                             ...formData,
-                                            timeBlock: { startTime: '09:00', duration: 60 }
+                                            timeBlock: { startTime: '09:00', duration: 30 }
                                         });
                                     } else {
                                         setFormData({ ...formData, timeBlock: undefined });
@@ -176,17 +176,22 @@ export function TaskModal({ isOpen, onClose, onSaved, task, defaultDate }: TaskM
                                 </div>
                                 <div>
                                     <label className="block text-xs text-gray-500 mb-1">Duration (min)</label>
-                                    <input
-                                        type="number"
-                                        min="15"
-                                        step="15"
+                                    <select
                                         value={formData.timeBlock.duration}
                                         onChange={(e) => setFormData({
                                             ...formData,
                                             timeBlock: { ...formData.timeBlock!, duration: parseInt(e.target.value) }
                                         })}
                                         className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm"
-                                    />
+                                    >
+                                        <option value="15">15 min</option>
+                                        <option value="30">30 min</option>
+                                        <option value="45">45 min</option>
+                                        <option value="60">1 hour</option>
+                                        <option value="90">1.5 hours</option>
+                                        <option value="120">2 hours</option>
+                                        <option value="180">3 hours</option>
+                                    </select>
                                 </div>
                             </div>
                         )}
