@@ -11,15 +11,20 @@ export function TodoDashboardWidget() {
     const [tasks, setTasks] = useState<Task[]>([]);
 
     useEffect(() => {
-        setTasks(storage.getTasks());
+        loadTasks();
 
         // Refresh every minute
         const interval = setInterval(() => {
-            setTasks(storage.getTasks());
+            loadTasks();
         }, 60000);
 
         return () => clearInterval(interval);
     }, []);
+
+    const loadTasks = async () => {
+        const loadedTasks = await storage.getTasks();
+        setTasks(loadedTasks);
+    };
 
     const todayTasks = tasks.filter(isTaskDueToday).slice(0, 5);
     const weekTasks = tasks.filter(isTaskDueThisWeek).filter(t => !isTaskDueToday(t)).slice(0, 5);
