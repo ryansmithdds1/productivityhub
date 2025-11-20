@@ -1,43 +1,51 @@
 import type { Script, AppSettings } from '../types';
 
-const STORAGE_KEYS = {
-    SCRIPTS: 'hookpoint_scripts',
-    SETTINGS: 'hookpoint_settings',
-};
-
 export const storage = {
     // Scripts
-    getScripts(): Script[] {
+    async getScripts(): Promise<Script[]> {
         try {
-            const data = localStorage.getItem(STORAGE_KEYS.SCRIPTS);
-            return data ? JSON.parse(data) : [];
-        } catch {
+            const response = await fetch('/api/hookpoint');
+            if (!response.ok) throw new Error('Failed to fetch scripts');
+            return await response.json();
+        } catch (error) {
+            console.error('Error fetching scripts:', error);
             return [];
         }
     },
 
-    saveScript(script: Script): void {
-        const scripts = this.getScripts();
-        const index = scripts.findIndex(s => s.id === script.id);
-
-        if (index !== -1) {
-            scripts[index] = script;
-        } else {
-            scripts.push(script);
-        }
-
-        localStorage.setItem(STORAGE_KEYS.SCRIPTS, JSON.stringify(scripts));
-    },
-
-    deleteScript(id: string): void {
-        const scripts = this.getScripts().filter(s => s.id !== id);
-        localStorage.setItem(STORAGE_KEYS.SCRIPTS, JSON.stringify(scripts));
-    },
-
-    // Settings
-    getSettings(): AppSettings {
+    async saveScript(script: Script): Promise<Script | null> {
         try {
-            const data = localStorage.getItem(STORAGE_KEYS.SETTINGS);
+            // Check if script exists to decide between POST and PUT
+            const allScripts = await this.getScripts();
+            const exists = allScripts.some(s => s.id === script.id);
+
+            const response = await fetch('/api/hookpoint', {
+                method: exists ? 'PUT' : 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(script),
+            });
+
+            if (!response.ok) throw new Error('Failed to save script');
+            return await response.json();
+        } catch (error) {
+            console.error('Error saving script:', error);
+            return null;
+        }
+    },
+
+    async deleteScript(id: string): Promise<void> {
+        try {
+            await fetch(`/api/hookpoint?id=${id}`, { method: 'DELETE' });
+        } catch (error) {
+            console.error('Error deleting script:', error);
+        }
+    },
+
+    // Settings (keep in localStorage for now - not critical data)
+    getSettings(): AppSettings {
+        if (typeof window === 'undefined') return {};
+        try {
+            const data = localStorage.getItem('hookpoint_settings');
             return data ? JSON.parse(data) : {};
         } catch {
             return {};
@@ -45,7 +53,8 @@ export const storage = {
     },
 
     saveSettings(settings: AppSettings): void {
-        localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(settings));
+        if (typeof window === 'undefined') return;
+        localStorage.setItem('hookpoint_settings', JSON.stringify(settings));
     },
 
     getApiKey(): string | undefined {
