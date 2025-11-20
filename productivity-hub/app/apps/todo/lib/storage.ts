@@ -38,7 +38,43 @@ export const storage = {
     },
 
     completeTask(id: string): void {
+        const tasks = this.getTasks();
+        const task = tasks.find(t => t.id === id);
+
+        if (!task) return;
+
+        // 1. Mark current task as completed
         this.updateTask(id, { completed: true, completedAt: Date.now() });
+
+        // 2. If recurring, create next instance
+        if (task.recurring && !task.completed) { // Check !completed to avoid double generation
+            const { frequency, interval } = task.recurring;
+            const currentDueDate = new Date(task.dueDate);
+            let nextDueDate = new Date(currentDueDate);
+
+            if (frequency === 'daily') {
+                nextDueDate.setDate(currentDueDate.getDate() + interval);
+            } else if (frequency === 'weekly') {
+                nextDueDate.setDate(currentDueDate.getDate() + (interval * 7));
+            } else if (frequency === 'monthly') {
+                nextDueDate.setMonth(currentDueDate.getMonth() + interval);
+            }
+
+            const newTask: Task = {
+                ...task,
+                id: crypto.randomUUID(),
+                dueDate: nextDueDate.getTime(),
+                completed: false,
+                completedAt: undefined,
+                createdAt: Date.now(),
+                updatedAt: Date.now(),
+                // Keep the same time block if it exists
+                timeBlock: task.timeBlock,
+                recurring: task.recurring
+            };
+
+            this.saveTask(newTask);
+        }
     },
 
     uncompleteTask(id: string): void {

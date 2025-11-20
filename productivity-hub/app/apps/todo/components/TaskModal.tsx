@@ -25,12 +25,41 @@ export function TaskModal({ isOpen, onClose, onSaved, task, defaultDate }: TaskM
         recurring: task?.recurring,
     });
 
+    const [hasTimeBlock, setHasTimeBlock] = useState(!!task?.timeBlock);
+    const [hasRecurring, setHasRecurring] = useState(!!task?.recurring);
+
+    // Reset form when opening
+    if (isOpen && formData.title === '' && !task && formData.dueDate !== (defaultDate || getStartOfDay())) {
+        // This is a simple check to avoid infinite loops, but better to use useEffect
+    }
+
+    // Sync state with props when modal opens
+    const [prevIsOpen, setPrevIsOpen] = useState(false);
+    if (isOpen !== prevIsOpen) {
+        setPrevIsOpen(isOpen);
+        if (isOpen) {
+            setFormData({
+                title: task?.title || '',
+                description: task?.description || '',
+                dueDate: task?.dueDate || defaultDate || getStartOfDay(),
+                priority: task?.priority || 'medium',
+                category: task?.category || 'work',
+                timeBlock: task?.timeBlock,
+                recurring: task?.recurring,
+            });
+            setHasTimeBlock(!!task?.timeBlock);
+            setHasRecurring(!!task?.recurring);
+        }
+    }
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
         const newTask: Task = {
             id: task?.id || crypto.randomUUID(),
             ...formData,
+            timeBlock: hasTimeBlock ? (formData.timeBlock || { startTime: '09:00', duration: 30 }) : undefined,
+            recurring: hasRecurring ? (formData.recurring || { frequency: 'daily', interval: 1 }) : undefined,
             completed: task?.completed || false,
             createdAt: task?.createdAt || Date.now(),
             updatedAt: Date.now(),
@@ -144,14 +173,10 @@ export function TaskModal({ isOpen, onClose, onSaved, task, defaultDate }: TaskM
                         <label className="flex items-center gap-2 text-sm font-medium text-gray-400 mb-2">
                             <input
                                 type="checkbox"
-                                checked={!!formData.timeBlock}
+                                checked={hasTimeBlock}
                                 onChange={(e) => {
-                                    if (e.target.checked) {
-                                        setFormData({
-                                            ...formData,
-                                            timeBlock: { startTime: '09:00', duration: 30 }
-                                        });
-                                    } else {
+                                    setHasTimeBlock(e.target.checked);
+                                    if (!e.target.checked) {
                                         setFormData({ ...formData, timeBlock: undefined });
                                     }
                                 }}
@@ -160,13 +185,13 @@ export function TaskModal({ isOpen, onClose, onSaved, task, defaultDate }: TaskM
                             Schedule Time Block
                         </label>
 
-                        {formData.timeBlock && (
+                        {hasTimeBlock && (
                             <div className="grid grid-cols-2 gap-4 ml-6">
                                 <div>
                                     <label className="block text-xs text-gray-500 mb-1">Start Time</label>
                                     <input
                                         type="time"
-                                        value={formData.timeBlock.startTime}
+                                        value={formData.timeBlock?.startTime || '09:00'}
                                         onChange={(e) => setFormData({
                                             ...formData,
                                             timeBlock: { ...formData.timeBlock!, startTime: e.target.value }
@@ -177,7 +202,7 @@ export function TaskModal({ isOpen, onClose, onSaved, task, defaultDate }: TaskM
                                 <div>
                                     <label className="block text-xs text-gray-500 mb-1">Duration (min)</label>
                                     <select
-                                        value={formData.timeBlock.duration}
+                                        value={formData.timeBlock?.duration || 30}
                                         onChange={(e) => setFormData({
                                             ...formData,
                                             timeBlock: { ...formData.timeBlock!, duration: parseInt(e.target.value) }
@@ -192,6 +217,64 @@ export function TaskModal({ isOpen, onClose, onSaved, task, defaultDate }: TaskM
                                         <option value="120">2 hours</option>
                                         <option value="180">3 hours</option>
                                     </select>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Recurring Task */}
+                    <div>
+                        <label className="flex items-center gap-2 text-sm font-medium text-gray-400 mb-2">
+                            <input
+                                type="checkbox"
+                                checked={hasRecurring}
+                                onChange={(e) => {
+                                    setHasRecurring(e.target.checked);
+                                    if (!e.target.checked) {
+                                        setFormData({ ...formData, recurring: undefined });
+                                    }
+                                }}
+                                className="rounded"
+                            />
+                            Recurring Task
+                        </label>
+
+                        {hasRecurring && (
+                            <div className="grid grid-cols-2 gap-4 ml-6">
+                                <div>
+                                    <label className="block text-xs text-gray-500 mb-1">Frequency</label>
+                                    <select
+                                        value={formData.recurring?.frequency || 'daily'}
+                                        onChange={(e) => setFormData({
+                                            ...formData,
+                                            recurring: {
+                                                frequency: e.target.value as 'daily' | 'weekly' | 'monthly',
+                                                interval: formData.recurring?.interval || 1
+                                            }
+                                        })}
+                                        className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm"
+                                    >
+                                        <option value="daily">Daily</option>
+                                        <option value="weekly">Weekly</option>
+                                        <option value="monthly">Monthly</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-xs text-gray-500 mb-1">Interval (Every X)</label>
+                                    <input
+                                        type="number"
+                                        min="1"
+                                        max="365"
+                                        value={formData.recurring?.interval || 1}
+                                        onChange={(e) => setFormData({
+                                            ...formData,
+                                            recurring: {
+                                                frequency: formData.recurring?.frequency || 'daily',
+                                                interval: parseInt(e.target.value)
+                                            }
+                                        })}
+                                        className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm"
+                                    />
                                 </div>
                             </div>
                         )}
