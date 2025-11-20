@@ -10,12 +10,14 @@ interface TaskCardProps {
     task: Task;
     compact?: boolean;
     onUpdate: () => void;
+    onEdit?: () => void;
 }
 
-export function TaskCard({ task, compact = false, onUpdate }: TaskCardProps) {
+export function TaskCard({ task, compact = false, onUpdate, onEdit }: TaskCardProps) {
     const [isResizing, setIsResizing] = useState(false);
 
-    const handleToggleComplete = () => {
+    const handleToggleComplete = (e: React.MouseEvent) => {
+        e.stopPropagation();
         if (task.completed) {
             storage.uncompleteTask(task.id);
         } else {
@@ -71,8 +73,9 @@ export function TaskCard({ task, compact = false, onUpdate }: TaskCardProps) {
 
     return (
         <div
+            onClick={onEdit}
             className={`border rounded-lg p-3 pb-5 transition-all relative ${getCategoryColor(task.category)} ${compact ? 'text-sm' : 'h-full'
-                } ${task.completed ? 'opacity-50' : ''} ${isResizing ? 'ring-2 ring-orange-500 z-10' : ''}`}
+                } ${task.completed ? 'opacity-50' : ''} ${isResizing ? 'ring-2 ring-orange-500 z-10' : ''} cursor-pointer hover:brightness-110`}
         >
             <div className="flex items-start gap-2 h-full overflow-hidden">
                 <button
@@ -123,8 +126,9 @@ export function TaskCard({ task, compact = false, onUpdate }: TaskCardProps) {
                 <div
                     draggable={false}
                     onMouseDown={handleResizeStart}
+                    onClick={(e) => e.stopPropagation()}
                     onDragStart={(e) => e.preventDefault()}
-                    className="absolute bottom-0 left-0 right-0 h-3 cursor-ns-resize flex items-center justify-center hover:bg-orange-500/30 transition-colors group border-t border-transparent hover:border-orange-500/50"
+                    className="resize-handle absolute bottom-0 left-0 right-0 h-3 cursor-ns-resize flex items-center justify-center hover:bg-orange-500/30 transition-colors group border-t border-transparent hover:border-orange-500/50"
                     title="Drag to resize duration"
                 >
                     <GripHorizontal size={16} className="text-gray-600 group-hover:text-orange-400" />

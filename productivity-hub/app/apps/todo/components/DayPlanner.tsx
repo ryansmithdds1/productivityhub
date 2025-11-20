@@ -10,6 +10,7 @@ interface DayPlannerProps {
     date: number;
     tasks: Task[];
     onTaskUpdate: () => void;
+    onEditTask: (task: Task) => void;
 }
 
 const START_HOUR = 5;
@@ -17,7 +18,7 @@ const END_HOUR = 23;
 const HOURS = Array.from({ length: END_HOUR - START_HOUR }, (_, i) => i + START_HOUR);
 const HOUR_HEIGHT = 80; // px
 
-export function DayPlanner({ date, tasks, onTaskUpdate }: DayPlannerProps) {
+export function DayPlanner({ date, tasks, onTaskUpdate, onEditTask }: DayPlannerProps) {
     const [draggedTask, setDraggedTask] = useState<Task | null>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const [groupBy, setGroupBy] = useState<'none' | 'category' | 'priority'>('category');
@@ -194,7 +195,12 @@ export function DayPlanner({ date, tasks, onTaskUpdate }: DayPlannerProps) {
                                                 onDragStart={() => handleDragStart(task)}
                                                 className="cursor-move hover:scale-[1.02] transition-transform"
                                             >
-                                                <TaskCard task={task} compact onUpdate={onTaskUpdate} />
+                                                <TaskCard
+                                                    task={task}
+                                                    compact
+                                                    onUpdate={onTaskUpdate}
+                                                    onEdit={() => onEditTask(task)}
+                                                />
                                             </div>
                                         ))}
                                     </div>
@@ -236,11 +242,21 @@ export function DayPlanner({ date, tasks, onTaskUpdate }: DayPlannerProps) {
                         <div
                             key={task.id}
                             style={getTaskStyle(task)}
-                            className="absolute transition-all duration-200"
+                            draggable
+                            onDragStart={(e) => {
+                                // Prevent drag if resizing
+                                if ((e.target as HTMLElement).closest('.resize-handle')) {
+                                    e.preventDefault();
+                                    return;
+                                }
+                                handleDragStart(task);
+                            }}
+                            className="absolute transition-all duration-200 cursor-move hover:z-20"
                         >
                             <TaskCard
                                 task={task}
                                 onUpdate={onTaskUpdate}
+                                onEdit={() => onEditTask(task)}
                             />
                         </div>
                     ))}

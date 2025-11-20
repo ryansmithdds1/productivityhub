@@ -13,6 +13,7 @@ export default function TodoApp() {
     const [tasks, setTasks] = useState<Task[]>([]);
     const [currentDate, setCurrentDate] = useState(getStartOfDay());
     const [showTaskModal, setShowTaskModal] = useState(false);
+    const [editingTask, setEditingTask] = useState<Task | undefined>(undefined);
 
     useEffect(() => {
         setTasks(storage.getTasks());
@@ -32,6 +33,16 @@ export default function TodoApp() {
 
     const handleTaskUpdate = () => {
         setTasks(storage.getTasks());
+    };
+
+    const handleEditTask = (task: Task) => {
+        setEditingTask(task);
+        setShowTaskModal(true);
+    };
+
+    const handleCloseModal = () => {
+        setShowTaskModal(false);
+        setEditingTask(undefined);
     };
 
     return (
@@ -100,15 +111,17 @@ export default function TodoApp() {
                     date={currentDate}
                     tasks={tasks}
                     onTaskUpdate={handleTaskUpdate}
+                    onEditTask={handleEditTask}
                 />
             </div>
 
             {/* Task Modal */}
             <TaskModal
                 isOpen={showTaskModal}
-                onClose={() => setShowTaskModal(false)}
+                onClose={handleCloseModal}
                 onSaved={handleTaskUpdate}
                 defaultDate={currentDate}
+                task={editingTask}
             />
         </DashboardLayout>
     );
