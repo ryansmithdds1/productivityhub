@@ -47,7 +47,7 @@ export default function ContentCalendarApp() {
         }
     };
 
-    const handleQuickAdd = (type: 'short' | 'youtube' | 'newsletter') => {
+    const handleQuickAdd = async (type: 'short' | 'youtube' | 'newsletter') => {
         let newContent: Content;
         const tomorrow = new Date();
         tomorrow.setDate(tomorrow.getDate() + 1);
@@ -374,7 +374,7 @@ export default function ContentCalendarApp() {
                 isOpen={showBulkAdd}
                 onClose={() => setShowBulkAdd(false)}
                 onSaved={() => {
-                    setContent(storage.getContent());
+                    loadContent();
                     setShowBulkAdd(false);
                 }}
                 weekStart={currentWeekStart}
