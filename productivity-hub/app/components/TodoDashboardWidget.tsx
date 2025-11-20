@@ -30,13 +30,13 @@ export function TodoDashboardWidget() {
     const weekTasks = tasks.filter(isTaskDueThisWeek).filter(t => !isTaskDueToday(t)).slice(0, 5);
     const recurringTasks = tasks.filter(shouldShowRecurringTask).slice(0, 3);
 
-    const handleToggleComplete = (task: Task) => {
+    const handleToggleComplete = async (task: Task) => {
         if (task.completed) {
-            storage.uncompleteTask(task.id);
+            await storage.uncompleteTask(task);
         } else {
-            storage.completeTask(task.id);
+            await storage.completeTask(task);
         }
-        setTasks(storage.getTasks());
+        await loadTasks();
     };
 
     return (
