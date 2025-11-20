@@ -14,8 +14,13 @@ export function Dashboard({ onNewScript, onEditScript, onNavigate }: DashboardPr
     const [scripts, setScripts] = useState<Script[]>([]);
 
     useEffect(() => {
-        setScripts(storage.getScripts());
+        loadScripts();
     }, []);
+
+    const loadScripts = async () => {
+        const loadedScripts = await storage.getScripts();
+        setScripts(loadedScripts);
+    };
 
     const categoryColors = {
         clinical: 'bg-blue-500/10 text-blue-400 border-blue-500/20',

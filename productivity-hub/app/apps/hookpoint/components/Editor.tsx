@@ -39,7 +39,7 @@ export function Editor({ script, initialHook, initialCategory, onBack, onSaved }
 
     const geminiService = new GeminiService(storage.getApiKey());
 
-    const handleSave = () => {
+    const handleSave = async () => {
         const scriptData: Script = {
             id: script?.id || `script-${Date.now()}`,
             title,
@@ -53,7 +53,7 @@ export function Editor({ script, initialHook, initialCategory, onBack, onSaved }
             updatedAt: Date.now(),
         };
 
-        storage.saveScript(scriptData);
+        await storage.saveScript(scriptData);
         setSaved(true);
         setTimeout(() => {
             setSaved(false);
@@ -61,9 +61,9 @@ export function Editor({ script, initialHook, initialCategory, onBack, onSaved }
         }, 1500);
     };
 
-    const handleDelete = () => {
+    const handleDelete = async () => {
         if (script && confirm('Delete this script?')) {
-            storage.deleteScript(script.id);
+            await storage.deleteScript(script.id);
             onBack();
         }
     };
