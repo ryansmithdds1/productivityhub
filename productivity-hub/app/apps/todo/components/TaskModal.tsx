@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { X } from 'lucide-react';
-import type { Task, TaskFormData, Priority, Category } from '../types';
+import { X, Plus, Trash2, CheckSquare, Square } from 'lucide-react';
+import type { Task, TaskFormData, Priority, Category, Subtask } from '../types';
 import { storage } from '../lib/storage';
 import { getStartOfDay } from '../lib/utils';
 
@@ -23,10 +23,12 @@ export function TaskModal({ isOpen, onClose, onSaved, task, defaultDate }: TaskM
         category: task?.category || 'work',
         timeBlock: task?.timeBlock,
         recurring: task?.recurring,
+        subtasks: task?.subtasks || [],
     });
 
     const [hasTimeBlock, setHasTimeBlock] = useState(!!task?.timeBlock);
     const [hasRecurring, setHasRecurring] = useState(!!task?.recurring);
+    const [newSubtaskTitle, setNewSubtaskTitle] = useState('');
 
     // Reset form when opening
     if (isOpen && formData.title === '' && !task && formData.dueDate !== (defaultDate || getStartOfDay())) {
@@ -46,11 +48,46 @@ export function TaskModal({ isOpen, onClose, onSaved, task, defaultDate }: TaskM
                 category: task?.category || 'work',
                 timeBlock: task?.timeBlock,
                 recurring: task?.recurring,
+                subtasks: task?.subtasks || [],
             });
             setHasTimeBlock(!!task?.timeBlock);
             setHasRecurring(!!task?.recurring);
+            setNewSubtaskTitle('');
         }
     }
+
+    const handleAddSubtask = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!newSubtaskTitle.trim()) return;
+
+        const newSubtask: Subtask = {
+            id: crypto.randomUUID(),
+            title: newSubtaskTitle.trim(),
+            completed: false
+        };
+
+        setFormData({
+            ...formData,
+            subtasks: [...(formData.subtasks || []), newSubtask]
+        });
+        setNewSubtaskTitle('');
+    };
+
+    const handleRemoveSubtask = (id: string) => {
+        setFormData({
+            ...formData,
+            subtasks: (formData.subtasks || []).filter(st => st.id !== id)
+        });
+    };
+
+    const handleToggleSubtask = (id: string) => {
+        setFormData({
+            ...formData,
+            subtasks: (formData.subtasks || []).map(st =>
+                st.id === id ? { ...st, completed: !st.completed } : st
+            )
+        });
+    };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -117,6 +154,67 @@ export function TaskModal({ isOpen, onClose, onSaved, task, defaultDate }: TaskM
                             className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-orange-500"
                             placeholder="Add notes..."
                         />
+                    </div>
+
+                    {/* Subtasks */}
+                    <div>
+                        <label className="block text-sm font-medium text-gray-400 mb-2">
+                            Subtasks
+                        </label>
+
+                        {/* Subtask List */}
+                        <div className="space-y-2 mb-3">
+                            {(formData.subtasks || []).map((subtask) => (
+                                <div key={subtask.id} className="flex items-center gap-2 bg-gray-800/50 p-2 rounded-lg group">
+                                    <button
+                                        type="button"
+                                        onClick={() => handleToggleSubtask(subtask.id)}
+                                        className="text-gray-400 hover:text-orange-500 transition-colors"
+                                    >
+                                        {subtask.completed ? (
+                                            <CheckSquare size={18} className="text-orange-500" />
+                                        ) : (
+                                            <Square size={18} />
+                                        )}
+                                    </button>
+                                    <span className={`flex-1 text-sm ${subtask.completed ? 'text-gray-500 line-through' : 'text-gray-200'}`}>
+                                        {subtask.title}
+                                    </span>
+                                    <button
+                                        type="button"
+                                        onClick={() => handleRemoveSubtask(subtask.id)}
+                                        className="opacity-0 group-hover:opacity-100 text-gray-500 hover:text-red-500 transition-opacity p-1"
+                                    >
+                                        <Trash2 size={16} />
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Add Subtask Input */}
+                        <div className="flex gap-2">
+                            <input
+                                type="text"
+                                value={newSubtaskTitle}
+                                onChange={(e) => setNewSubtaskTitle(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                        e.preventDefault();
+                                        handleAddSubtask(e);
+                                    }
+                                }}
+                                placeholder="Add a subtask..."
+                                className="flex-1 px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm focus:outline-none focus:border-orange-500"
+                            />
+                            <button
+                                type="button"
+                                onClick={handleAddSubtask}
+                                disabled={!newSubtaskTitle.trim()}
+                                className="p-2 bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white rounded-lg border border-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                <Plus size={20} />
+                            </button>
+                        </div>
                     </div>
 
                     {/* Due Date */}

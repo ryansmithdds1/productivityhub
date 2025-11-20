@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Check, Circle, Clock, AlertCircle, GripHorizontal } from 'lucide-react';
+import { Check, Circle, Clock, AlertCircle, GripHorizontal, CheckSquare } from 'lucide-react';
 import type { Task } from '../types';
 import { formatTimeBlock, getCategoryColor, getPriorityColor } from '../lib/utils';
 import { storage } from '../lib/storage';
@@ -100,6 +100,15 @@ export function TaskCard({ task, compact = false, onUpdate }: TaskCardProps) {
                         <div className="flex items-center gap-1 text-xs text-gray-400 mt-1">
                             <Clock size={12} />
                             {formatTimeBlock(task.timeBlock.startTime, task.timeBlock.duration)}
+                        </div>
+                    )}
+
+                    {task.subtasks && task.subtasks.length > 0 && !compact && (
+                        <div className="flex items-center gap-1 text-xs text-gray-400 mt-1">
+                            <CheckSquare size={12} />
+                            <span>
+                                {task.subtasks.filter(st => st.completed).length}/{task.subtasks.length}
+                            </span>
                         </div>
                     )}
 

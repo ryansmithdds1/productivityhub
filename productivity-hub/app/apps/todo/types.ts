@@ -14,27 +14,35 @@ export interface RecurringPattern {
     endDate?: number; // optional end timestamp
 }
 
-export interface Task {
+export interface Subtask {
     id: string;
     title: string;
-    description?: string;
-    dueDate: number; // timestamp (start of day)
     completed: boolean;
-    completedAt?: number;
-    priority: Priority;
-    category: Category;
-    timeBlock?: TimeBlock;
-    recurring?: RecurringPattern;
-    createdAt: number;
-    updatedAt: number;
 }
 
-export interface TaskFormData {
+export interface Task {
+    id: string;
     title: string;
     description?: string;
     dueDate: number;
     priority: Priority;
     category: Category;
+    completed: boolean;
+    completedAt?: number;
+    createdAt: number;
+    updatedAt: number;
     timeBlock?: TimeBlock;
     recurring?: RecurringPattern;
+    subtasks?: Subtask[];
+}
+
+export interface TaskFormData {
+    title: string;
+    description: string;
+    dueDate: number;
+    priority: Priority;
+    category: Category;
+    timeBlock?: TimeBlock;
+    recurring?: RecurringPattern;
+    subtasks?: Subtask[];
 }
