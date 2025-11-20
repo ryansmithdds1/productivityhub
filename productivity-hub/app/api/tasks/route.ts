@@ -26,22 +26,38 @@ export async function GET() {
 export async function POST(request: Request) {
     try {
         const body = await request.json();
-        const { id, subtasks, ...data } = body;
+        const { id, subtasks, timeBlock, recurring, ...data } = body;
 
-        // Ensure timestamps are BigInt
-        const payload = {
-            ...data,
+        // Build payload with proper type conversions
+        const payload: any = {
+            title: data.title,
+            description: data.description || null,
             dueDate: BigInt(data.dueDate),
+            priority: data.priority,
+            category: data.category,
+            completed: data.completed || false,
+            completedAt: data.completedAt ? BigInt(data.completedAt) : null,
             createdAt: BigInt(data.createdAt),
             updatedAt: BigInt(data.updatedAt),
-            completedAt: data.completedAt ? BigInt(data.completedAt) : null,
-            subtasks: {
-                create: subtasks?.map((st: any) => ({
-                    title: st.title,
-                    completed: st.completed
-                })) || []
-            }
         };
+
+        // Add JSON fields only if they exist
+        if (timeBlock) {
+            payload.timeBlock = timeBlock;
+        }
+        if (recurring) {
+            payload.recurring = recurring;
+        }
+
+        // Add subtasks if they exist
+        if (subtasks && subtasks.length > 0) {
+            payload.subtasks = {
+                create: subtasks.map((st: any) => ({
+                    title: st.title,
+                    completed: st.completed || false
+                }))
+            };
+        }
 
         const task = await prisma.task.create({
             data: payload,
@@ -50,22 +66,38 @@ export async function POST(request: Request) {
         return NextResponse.json(serialize(task));
     } catch (error) {
         console.error('Error creating task:', error);
-        return NextResponse.json({ error: 'Failed to create task' }, { status: 500 });
+        return NextResponse.json({
+            error: 'Failed to create task',
+            details: error instanceof Error ? error.message : 'Unknown error'
+        }, { status: 500 });
     }
 }
 
 export async function PUT(request: Request) {
     try {
         const body = await request.json();
-        const { id, subtasks, ...data } = body;
+        const { id, subtasks, timeBlock, recurring, ...data } = body;
 
-        const payload = {
-            ...data,
+        // Build payload with proper type conversions
+        const payload: any = {
+            title: data.title,
+            description: data.description || null,
             dueDate: BigInt(data.dueDate),
+            priority: data.priority,
+            category: data.category,
+            completed: data.completed || false,
+            completedAt: data.completedAt ? BigInt(data.completedAt) : null,
             createdAt: BigInt(data.createdAt),
             updatedAt: BigInt(data.updatedAt),
-            completedAt: data.completedAt ? BigInt(data.completedAt) : null,
         };
+
+        // Add JSON fields only if they exist
+        if (timeBlock) {
+            payload.timeBlock = timeBlock;
+        }
+        if (recurring) {
+            payload.recurring = recurring;
+        }
 
         // Update task
         const task = await prisma.task.update({
@@ -74,16 +106,15 @@ export async function PUT(request: Request) {
             include: { subtasks: true }
         });
 
-        // Handle subtasks update (delete all and recreate is simplest for now, or intelligent update)
-        // For simplicity in this phase, we'll delete existing and recreate if subtasks are provided
-        if (subtasks) {
+        // Handle subtasks update
+        if (subtasks !== undefined) {
             await prisma.subtask.deleteMany({ where: { taskId: id } });
             if (subtasks.length > 0) {
                 await prisma.subtask.createMany({
                     data: subtasks.map((st: any) => ({
                         taskId: id,
                         title: st.title,
-                        completed: st.completed
+                        completed: st.completed || false
                     }))
                 });
             }
@@ -97,7 +128,10 @@ export async function PUT(request: Request) {
         return NextResponse.json(serialize(updatedTask));
     } catch (error) {
         console.error('Error updating task:', error);
-        return NextResponse.json({ error: 'Failed to update task' }, { status: 500 });
+        return NextResponse.json({
+            error: 'Failed to update task',
+            details: error instanceof Error ? error.message : 'Unknown error'
+        }, { status: 500 });
     }
 }
 
