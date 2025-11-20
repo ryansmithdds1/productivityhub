@@ -72,7 +72,7 @@ export function DayPlanner({ date, tasks, onTaskUpdate, onEditTask }: DayPlanner
         e.preventDefault();
     };
 
-    const handleDrop = (e: React.DragEvent) => {
+    const handleDrop = async (e: React.DragEvent) => {
         e.preventDefault();
         if (!draggedTask || !containerRef.current) return;
 
@@ -109,8 +109,8 @@ export function DayPlanner({ date, tasks, onTaskUpdate, onEditTask }: DayPlanner
             }
         };
 
-        const { storage: taskStorage } = require('../lib/storage');
-        taskStorage.saveTask(updatedTask);
+        const { storage: taskStorage } = await import('../lib/storage');
+        await taskStorage.updateTask(updatedTask);
 
         setDraggedTask(null);
         onTaskUpdate();

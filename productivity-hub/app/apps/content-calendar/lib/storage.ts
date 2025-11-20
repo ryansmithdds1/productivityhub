@@ -3,33 +3,47 @@ import type { Content, Newsletter, NewsletterSection } from '../types';
 const STORAGE_KEY = 'content_calendar_items';
 
 export const storage = {
-    getContent(): Content[] {
-        if (typeof window === 'undefined') return [];
-        const data = localStorage.getItem(STORAGE_KEY);
-        return data ? JSON.parse(data) : [];
-    },
-
-    saveContent(content: Content): void {
-        const allContent = this.getContent();
-        const index = allContent.findIndex(c => c.id === content.id);
-
-        if (index >= 0) {
-            allContent[index] = content;
-        } else {
-            allContent.push(content);
+    async getContent(): Promise<Content[]> {
+        try {
+            const response = await fetch('/api/content');
+            if (!response.ok) throw new Error('Failed to fetch content');
+            return await response.json();
+        } catch (error) {
+            console.error('Error fetching content:', error);
+            return [];
         }
-
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(allContent));
     },
 
-    deleteContent(id: string): void {
-        const allContent = this.getContent();
-        const filtered = allContent.filter(c => c.id !== id);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
+    async saveContent(content: Content): Promise<Content | null> {
+        try {
+            // Determine if this is a create or update
+            const allContent = await this.getContent();
+            const exists = allContent.some(c => c.id === content.id);
+
+            const response = await fetch('/api/content', {
+                method: exists ? 'PUT' : 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(content),
+            });
+
+            if (!response.ok) throw new Error('Failed to save content');
+            return await response.json();
+        } catch (error) {
+            console.error('Error saving content:', error);
+            return null;
+        }
     },
 
-    getContentForWeek(weekStart: number): Content[] {
-        const allContent = this.getContent();
+    async deleteContent(id: string): Promise<void> {
+        try {
+            await fetch(`/api/content?id=${id}`, { method: 'DELETE' });
+        } catch (error) {
+            console.error('Error deleting content:', error);
+        }
+    },
+
+    async getContentForWeek(weekStart: number): Promise<Content[]> {
+        const allContent = await this.getContent();
         const weekEnd = weekStart + (7 * 24 * 60 * 60 * 1000);
 
         return allContent.filter(content => {
@@ -38,8 +52,8 @@ export const storage = {
         });
     },
 
-    getContentForMonth(year: number, month: number): Content[] {
-        const allContent = this.getContent();
+    async getContentForMonth(year: number, month: number): Promise<Content[]> {
+        const allContent = await this.getContent();
         const monthStart = new Date(year, month, 1).getTime();
         const monthEnd = new Date(year, month + 1, 0, 23, 59, 59).getTime();
 

@@ -1,0 +1,68 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Content {
+  id        String   @id @default(cuid())
+  type      String
+  title     String
+  dueDate   BigInt   // Storing timestamp as BigInt
+  status    String
+  createdAt BigInt
+  updatedAt BigInt
+  notes     String?
+
+  // Short specific
+  platform          String?
+  hookpointScriptId String?
+  
+  // YouTube specific
+  category        String?
+  thumbnailStatus String?
+  seoNotes        String?
+
+  // Newsletter specific
+  weekOf   BigInt?
+  sendDate BigInt?
+
+  // JSON fields for complex structures
+  checklist Json? // For Short and YouTube
+  sections  Json? // For Newsletter
+
+  @@map("content")
+}
+
+model Task {
+  id          String    @id @default(cuid())
+  title       String
+  description String?
+  dueDate     BigInt
+  priority    String
+  category    String
+  completed   Boolean   @default(false)
+  completedAt BigInt?
+  createdAt   BigInt
+  updatedAt   BigInt
+  
+  // JSON fields
+  timeBlock Json?
+  recurring Json?
+
+  subtasks Subtask[]
+
+  @@map("tasks")
+}
+
+model Subtask {
+  id        String  @id @default(cuid())
+  title     String
+  completed Boolean @default(false)
+  taskId    String
+  task      Task    @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@map("subtasks")
+}

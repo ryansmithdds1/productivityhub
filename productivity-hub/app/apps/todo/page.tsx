@@ -18,7 +18,7 @@ export default function TodoApp() {
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
     useEffect(() => {
-        setTasks(storage.getTasks());
+        loadTasks();
 
         // Auto-switch to list view on mobile
         if (window.innerWidth < 768) {
@@ -37,6 +37,11 @@ export default function TodoApp() {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
+    const loadTasks = async () => {
+        const loadedTasks = await storage.getTasks();
+        setTasks(loadedTasks);
+    };
+
     const goToPreviousDay = () => {
         setCurrentDate(prev => prev - (24 * 60 * 60 * 1000));
     };
@@ -49,8 +54,8 @@ export default function TodoApp() {
         setCurrentDate(getStartOfDay());
     };
 
-    const handleTaskUpdate = () => {
-        setTasks(storage.getTasks());
+    const handleTaskUpdate = async () => {
+        await loadTasks();
     };
 
     const handleEditTask = (task: Task) => {

@@ -16,12 +16,12 @@ interface TaskCardProps {
 export function TaskCard({ task, compact = false, onUpdate, onEdit }: TaskCardProps) {
     const [isResizing, setIsResizing] = useState(false);
 
-    const handleToggleComplete = (e: React.MouseEvent) => {
+    const handleToggleComplete = async (e: React.MouseEvent) => {
         e.stopPropagation();
         if (task.completed) {
-            storage.uncompleteTask(task.id);
+            await storage.uncompleteTask(task);
         } else {
-            storage.completeTask(task.id);
+            await storage.completeTask(task);
         }
         onUpdate();
     };
@@ -54,7 +54,7 @@ export function TaskCard({ task, compact = false, onUpdate, onEdit }: TaskCardPr
                         duration: newDuration
                     }
                 };
-                storage.saveTask(updatedTask);
+                storage.updateTask(updatedTask);
                 onUpdate();
             }
         };

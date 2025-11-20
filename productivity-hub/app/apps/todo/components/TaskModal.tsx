@@ -89,7 +89,7 @@ export function TaskModal({ isOpen, onClose, onSaved, task, defaultDate }: TaskM
         });
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
         const newTask: Task = {
@@ -102,7 +102,12 @@ export function TaskModal({ isOpen, onClose, onSaved, task, defaultDate }: TaskM
             updatedAt: Date.now(),
         };
 
-        storage.saveTask(newTask);
+        if (task) {
+            await storage.updateTask(newTask);
+        } else {
+            await storage.createTask(newTask);
+        }
+
         onSaved();
         onClose();
     };
