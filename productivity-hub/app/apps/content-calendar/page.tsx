@@ -22,23 +22,28 @@ export default function ContentCalendarApp() {
     const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
 
     useEffect(() => {
-        setContent(storage.getContent());
+        loadContent();
     }, []);
+
+    const loadContent = async () => {
+        const loadedContent = await storage.getContent();
+        setContent(loadedContent);
+    };
 
     const weekContent = content.filter(c => {
         const weekEnd = currentWeekStart + (7 * 24 * 60 * 60 * 1000);
         return c.dueDate >= currentWeekStart && c.dueDate < weekEnd;
     });
 
-    const handleUpdate = (updatedContent: Content) => {
-        storage.saveContent(updatedContent);
-        setContent(storage.getContent());
+    const handleUpdate = async (updatedContent: Content) => {
+        await storage.saveContent(updatedContent);
+        await loadContent();
     };
 
-    const handleDelete = (id: string) => {
+    const handleDelete = async (id: string) => {
         if (confirm('Delete this content?')) {
-            storage.deleteContent(id);
-            setContent(storage.getContent());
+            await storage.deleteContent(id);
+            await loadContent();
         }
     };
 
@@ -93,8 +98,8 @@ export default function ContentCalendarApp() {
                 break;
         }
 
-        storage.saveContent(newContent);
-        setContent(storage.getContent());
+        await storage.saveContent(newContent);
+        await loadContent();
         setShowAddMenu(false);
     };
 
