@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { Clock } from 'lucide-react';
+import { Clock, Layers, Filter, ChevronRight, ChevronDown } from 'lucide-react';
 import type { Task } from '../types';
 import { formatTime } from '../lib/utils';
 import { TaskCard } from './TaskCard';
@@ -20,11 +20,48 @@ const HOUR_HEIGHT = 80; // px
 export function DayPlanner({ date, tasks, onTaskUpdate }: DayPlannerProps) {
     const [draggedTask, setDraggedTask] = useState<Task | null>(null);
     const containerRef = useRef<HTMLDivElement>(null);
+    const [groupBy, setGroupBy] = useState<'none' | 'category' | 'priority'>('category');
+    const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
 
     // Filter tasks for this day
     const dayTasks = tasks.filter(t => t.dueDate === date && !t.completed);
     const scheduledTasks = dayTasks.filter(t => t.timeBlock);
     const unscheduledTasks = dayTasks.filter(t => !t.timeBlock);
+
+    // Group tasks
+    const getGroupedTasks = () => {
+        if (groupBy === 'none') return { 'All Tasks': unscheduledTasks };
+
+        const groups: Record<string, Task[]> = {};
+
+        unscheduledTasks.forEach(task => {
+            const key = groupBy === 'category' ? task.category : task.priority;
+            const label = key.charAt(0).toUpperCase() + key.slice(1);
+            if (!groups[label]) groups[label] = [];
+            groups[label].push(task);
+        });
+
+        // Sort keys (e.g. High, Medium, Low for priority)
+        if (groupBy === 'priority') {
+            const order = ['High', 'Medium', 'Low'];
+            const sortedGroups: Record<string, Task[]> = {};
+            order.forEach(key => {
+                if (groups[key]) sortedGroups[key] = groups[key];
+            });
+            return sortedGroups;
+        }
+
+        return groups;
+    };
+
+    const groupedTasks = getGroupedTasks();
+
+    const toggleGroup = (group: string) => {
+        setExpandedGroups(prev => ({
+            ...prev,
+            [group]: prev[group] === undefined ? false : !prev[group]
+        }));
+    };
 
     const handleDragStart = (task: Task) => {
         setDraggedTask(task);
@@ -100,26 +137,68 @@ export function DayPlanner({ date, tasks, onTaskUpdate }: DayPlannerProps) {
     };
 
     return (
-        <div className="grid grid-cols-[200px_1fr] gap-6 h-[calc(100vh-200px)]">
+        <div className="grid grid-cols-[250px_1fr] gap-6 h-[calc(100vh-200px)]">
             {/* Unscheduled Tasks Sidebar */}
-            <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 overflow-y-auto">
-                <h3 className="text-sm font-semibold text-gray-400 mb-4 uppercase tracking-wide">
-                    Unscheduled
-                </h3>
-                <div className="space-y-2">
+            <div className="bg-gray-900 border border-gray-800 rounded-xl flex flex-col overflow-hidden">
+                <div className="p-4 border-b border-gray-800 flex items-center justify-between bg-gray-900 z-10">
+                    <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wide">
+                        Unscheduled
+                    </h3>
+                    <div className="flex gap-1 bg-gray-800 rounded-lg p-1">
+                        <button
+                            onClick={() => setGroupBy('category')}
+                            className={`p-1.5 rounded ${groupBy === 'category' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-gray-300'}`}
+                            title="Group by Category"
+                        >
+                            <Layers size={14} />
+                        </button>
+                        <button
+                            onClick={() => setGroupBy('priority')}
+                            className={`p-1.5 rounded ${groupBy === 'priority' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-gray-300'}`}
+                            title="Group by Priority"
+                        >
+                            <Filter size={14} />
+                        </button>
+                    </div>
+                </div>
+
+                <div className="flex-1 overflow-y-auto p-4 space-y-4">
                     {unscheduledTasks.length === 0 ? (
                         <p className="text-gray-600 text-sm text-center py-4">
                             All tasks scheduled!
                         </p>
                     ) : (
-                        unscheduledTasks.map(task => (
-                            <div
-                                key={task.id}
-                                draggable
-                                onDragStart={() => handleDragStart(task)}
-                                className="cursor-move"
-                            >
-                                <TaskCard task={task} compact onUpdate={onTaskUpdate} />
+                        Object.entries(groupedTasks).map(([group, groupTasks]) => (
+                            <div key={group} className="space-y-2">
+                                <button
+                                    onClick={() => toggleGroup(group)}
+                                    className="flex items-center gap-2 w-full text-left text-xs font-medium text-gray-500 hover:text-gray-300 transition-colors"
+                                >
+                                    {expandedGroups[group] === false ? (
+                                        <ChevronRight size={14} />
+                                    ) : (
+                                        <ChevronDown size={14} />
+                                    )}
+                                    {group}
+                                    <span className="ml-auto bg-gray-800 px-1.5 py-0.5 rounded text-[10px]">
+                                        {groupTasks.length}
+                                    </span>
+                                </button>
+
+                                {expandedGroups[group] !== false && (
+                                    <div className="space-y-2 pl-2 border-l border-gray-800 ml-1.5">
+                                        {groupTasks.map(task => (
+                                            <div
+                                                key={task.id}
+                                                draggable
+                                                onDragStart={() => handleDragStart(task)}
+                                                className="cursor-move hover:scale-[1.02] transition-transform"
+                                            >
+                                                <TaskCard task={task} compact onUpdate={onTaskUpdate} />
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
                         ))
                     )}
