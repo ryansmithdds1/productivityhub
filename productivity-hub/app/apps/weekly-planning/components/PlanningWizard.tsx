@@ -71,7 +71,9 @@ export function PlanningWizard({ onComplete, onCancel, initialPlan }: PlanningWi
                     category,
                     priority: 'medium',
                     dueDate: Date.now() + (7 * 24 * 60 * 60 * 1000), // Due in 1 week
-                    completed: false
+                    completed: false,
+                    createdAt: Date.now(),
+                    updatedAt: Date.now()
                 })
             });
 
@@ -348,8 +350,8 @@ export function PlanningWizard({ onComplete, onCancel, initialPlan }: PlanningWi
                                         }}
                                         disabled={addedGoals.has(`content-${i}`)}
                                         className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${addedGoals.has(`content-${i}`)
-                                                ? 'bg-green-900/50 text-green-400 cursor-default'
-                                                : 'bg-green-600 hover:bg-green-700 text-white'
+                                            ? 'bg-green-900/50 text-green-400 cursor-default'
+                                            : 'bg-green-600 hover:bg-green-700 text-white'
                                             }`}
                                     >
                                         {addedGoals.has(`content-${i}`) ? '✅ Added' : '+ Add to To-Do'}
