@@ -36,6 +36,7 @@ export interface Task {
     timeBlock?: TimeBlock;
     recurring?: RecurringPattern;
     subtasks?: Subtask[];
+    completionHistory?: number[]; // Array of completion timestamps (up to 10)
 }
 
 export interface TaskFormData {

@@ -111,7 +111,7 @@ export const storage = {
         const updatedTask = { ...task, completed: true, completedAt: Date.now() };
         await this.updateTask(updatedTask);
 
-        // 2. If recurring, create next instance
+        // 2. If recurring, create next instance with completion history
         if (task.recurring && !task.completed) {
             const { frequency, interval } = task.recurring;
             const currentDueDate = new Date(task.dueDate);
@@ -125,6 +125,11 @@ export const storage = {
                 nextDueDate.setMonth(currentDueDate.getMonth() + interval);
             }
 
+            // Add current completion to history
+            const completionHistory = task.completionHistory || [];
+            completionHistory.unshift(Date.now()); // Add to beginning
+            const trimmedHistory = completionHistory.slice(0, 10); // Keep last 10
+
             const newTask: Task = {
                 ...task,
                 id: crypto.randomUUID(), // Generate new ID for the next instance
@@ -134,7 +139,8 @@ export const storage = {
                 createdAt: Date.now(),
                 updatedAt: Date.now(),
                 timeBlock: task.timeBlock,
-                recurring: task.recurring
+                recurring: task.recurring,
+                completionHistory: trimmedHistory
             };
 
             await this.createTask(newTask);

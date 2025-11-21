@@ -184,6 +184,28 @@ export function getCategoryColor(category: string): string {
     return colors[category as keyof typeof colors] || colors.other;
 }
 
+export function getLastCompletedText(task: Task): string | null {
+    if (!task.completionHistory || task.completionHistory.length === 0) {
+        return null;
+    }
+
+    const lastCompleted = task.completionHistory[0];
+    const now = Date.now();
+    const diff = now - lastCompleted;
+
+    const days = Math.floor(diff / (24 * 60 * 60 * 1000));
+    const weeks = Math.floor(days / 7);
+    const months = Math.floor(days / 30);
+
+    if (days === 0) return 'Today';
+    if (days === 1) return 'Yesterday';
+    if (days < 7) return `${days} days ago`;
+    if (weeks === 1) return '1 week ago';
+    if (weeks < 4) return `${weeks} weeks ago`;
+    if (months === 1) return '1 month ago';
+    return `${months} months ago`;
+}
+
 export function getPriorityColor(priority: string): string {
     const colors = {
         high: 'text-red-400',

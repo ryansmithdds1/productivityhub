@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Calendar, Home, Sprout, Tractor, Plus } from 'lucide-react';
 import type { Task, Category } from '../types';
-import { getCategoryColor, getNextRecurrence } from '../lib/utils';
+import { getCategoryColor, getNextRecurrence, getLastCompletedText } from '../lib/utils';
 
 interface MaintenancePlannerProps {
     tasks: Task[];
@@ -209,6 +209,14 @@ export function MaintenancePlanner({ tasks, onEditTask }: MaintenancePlannerProp
                                                                 <>
                                                                     <span>•</span>
                                                                     <span>Due {new Date(nextDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+                                                                </>
+                                                            )}
+                                                            {getLastCompletedText(task) && (
+                                                                <>
+                                                                    <span>•</span>
+                                                                    <span className="text-gray-500">
+                                                                        Last done: {getLastCompletedText(task)}
+                                                                    </span>
                                                                 </>
                                                             )}
                                                         </div>
