@@ -1,6 +1,6 @@
 export type Priority = 'high' | 'medium' | 'low';
-export type Category = 'work' | 'personal' | 'content' | 'health' | 'other';
-export type RecurringFrequency = 'daily' | 'weekly' | 'monthly';
+export type Category = 'work' | 'personal' | 'content' | 'health' | 'home' | 'property' | 'farm' | 'other';
+export type RecurringFrequency = 'daily' | 'weekly' | 'monthly' | 'quarterly' | 'bi-annual' | 'seasonal' | 'annual';
 
 export interface TimeBlock {
     startTime: string; // HH:mm format
@@ -11,6 +11,8 @@ export interface RecurringPattern {
     frequency: RecurringFrequency;
     interval: number; // e.g., every 2 days
     daysOfWeek?: number[]; // 0-6 for weekly (0=Sunday)
+    seasonalMonths?: number[]; // For bi-annual/seasonal: [3, 9] = March & September
+    specificMonth?: number; // For annual: 1 = January (1-12)
     endDate?: number; // optional end timestamp
 }
 

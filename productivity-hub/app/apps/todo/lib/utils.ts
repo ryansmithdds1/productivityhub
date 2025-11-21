@@ -55,7 +55,7 @@ export function isTaskDueThisWeek(task: Task): boolean {
 export function getNextRecurrence(task: Task): number | null {
     if (!task.recurring) return null;
 
-    const { frequency, interval, daysOfWeek, endDate } = task.recurring;
+    const { frequency, interval, daysOfWeek, seasonalMonths, specificMonth, endDate } = task.recurring;
     const now = getStartOfDay();
     let next = task.dueDate;
 
@@ -87,6 +87,75 @@ export function getNextRecurrence(task: Task): number | null {
                 d.setMonth(d.getMonth() + interval);
                 next = getStartOfDay(d);
                 break;
+            case 'quarterly':
+                // Every 3 months
+                const qDate = new Date(next);
+                qDate.setMonth(qDate.getMonth() + 3);
+                next = getStartOfDay(qDate);
+                break;
+            case 'bi-annual':
+            case 'seasonal':
+                // Occurs in specific months (e.g., March & September)
+                if (seasonalMonths && seasonalMonths.length > 0) {
+                    const currentDate = new Date(next);
+                    const currentMonth = currentDate.getMonth(); // 0-11
+
+                    // Find next occurrence in seasonalMonths
+                    let found = false;
+                    // Sort months to find next occurrence
+                    const sortedMonths = [...seasonalMonths].sort((a, b) => a - b);
+
+                    for (const month of sortedMonths) {
+                        const monthIndex = month - 1; // Convert 1-12 to 0-11
+                        if (monthIndex > currentMonth) {
+                            // Same year, later month
+                            currentDate.setMonth(monthIndex);
+                            currentDate.setDate(1);
+                            next = getStartOfDay(currentDate);
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if (!found) {
+                        // Next occurrence is next year, first month in array
+                        currentDate.setFullYear(currentDate.getFullYear() + 1);
+                        currentDate.setMonth(sortedMonths[0] - 1);
+                        currentDate.setDate(1);
+                        next = getStartOfDay(currentDate);
+                    }
+                } else {
+                    // Fallback: treat as yearly
+                    const aDate = new Date(next);
+                    aDate.setFullYear(aDate.getFullYear() + 1);
+                    next = getStartOfDay(aDate);
+                }
+                break;
+            case 'annual':
+                // Occurs once a year in a specific month
+                if (specificMonth) {
+                    const annualDate = new Date(next);
+                    const currentMonth = annualDate.getMonth(); // 0-11
+                    const targetMonth = specificMonth - 1; // Convert 1-12 to 0-11
+
+                    if (targetMonth > currentMonth) {
+                        // Same year
+                        annualDate.setMonth(targetMonth);
+                        annualDate.setDate(1);
+                    } else {
+                        // Next year
+                        annualDate.setFullYear(annualDate.getFullYear() + 1);
+                        annualDate.setMonth(targetMonth);
+                        annualDate.setDate(1);
+                    }
+                    next = getStartOfDay(annualDate);
+                } else {
+                    // Fallback: add one year
+                    const aDate = new Date(next);
+                    aDate.setFullYear(aDate.getFullYear() + 1);
+                    next = getStartOfDay(aDate);
+                }
+                break;
         }
     }
 
@@ -107,6 +176,9 @@ export function getCategoryColor(category: string): string {
         personal: 'bg-green-500/20 text-green-400 border-green-500/30',
         content: 'bg-purple-500/20 text-purple-400 border-purple-500/30',
         health: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
+        home: 'bg-orange-500/20 text-orange-400 border-orange-500/30',
+        property: 'bg-teal-500/20 text-teal-400 border-teal-500/30',
+        farm: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
         other: 'bg-gray-500/20 text-gray-400 border-gray-500/30',
     };
     return colors[category as keyof typeof colors] || colors.other;

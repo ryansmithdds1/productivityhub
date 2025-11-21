@@ -266,6 +266,9 @@ export function TaskModal({ isOpen, onClose, onSaved, task, defaultDate }: TaskM
                                 <option value="personal">Personal</option>
                                 <option value="content">Content</option>
                                 <option value="health">Health</option>
+                                <option value="home">Home Maintenance</option>
+                                <option value="property">Property/Outdoor</option>
+                                <option value="farm">Farm/Land</option>
                                 <option value="other">Other</option>
                             </select>
                         </div>
@@ -343,43 +346,120 @@ export function TaskModal({ isOpen, onClose, onSaved, task, defaultDate }: TaskM
                         </label>
 
                         {hasRecurring && (
-                            <div className="grid grid-cols-2 gap-4 ml-6">
-                                <div>
-                                    <label className="block text-xs text-gray-500 mb-1">Frequency</label>
-                                    <select
-                                        value={formData.recurring?.frequency || 'daily'}
-                                        onChange={(e) => setFormData({
-                                            ...formData,
-                                            recurring: {
-                                                frequency: e.target.value as 'daily' | 'weekly' | 'monthly',
-                                                interval: formData.recurring?.interval || 1
-                                            }
-                                        })}
-                                        className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm"
-                                    >
-                                        <option value="daily">Daily</option>
-                                        <option value="weekly">Weekly</option>
-                                        <option value="monthly">Monthly</option>
-                                    </select>
+                            <>
+                                <div className="grid grid-cols-2 gap-4 ml-6">
+                                    <div>
+                                        <label className="block text-xs text-gray-500 mb-1">Frequency</label>
+                                        <select
+                                            value={formData.recurring?.frequency || 'daily'}
+                                            onChange={(e) => setFormData({
+                                                ...formData,
+                                                recurring: {
+                                                    frequency: e.target.value as any,
+                                                    interval: formData.recurring?.interval || 1
+                                                }
+                                            })}
+                                            className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm"
+                                        >
+                                            <option value="daily">Daily</option>
+                                            <option value="weekly">Weekly</option>
+                                            <option value="monthly">Monthly</option>
+                                            <option value="quarterly">Quarterly (every 3 months)</option>
+                                            <option value="bi-annual">Bi-annual (twice a year)</option>
+                                            <option value="seasonal">Seasonal (specific months)</option>
+                                            <option value="annual">Annual (once a year)</option>
+                                        </select>
+                                    </div>
+                                    {formData.recurring?.frequency && !['quarterly', 'bi-annual', 'seasonal', 'annual'].includes(formData.recurring.frequency) && (
+                                        <div>
+                                            <label className="block text-xs text-gray-500 mb-1">Interval (Every X)</label>
+                                            <input
+                                                type="number"
+                                                min="1"
+                                                max="365"
+                                                value={formData.recurring?.interval || 1}
+                                                onChange={(e) => setFormData({
+                                                    ...formData,
+                                                    recurring: {
+                                                        frequency: formData.recurring?.frequency || 'daily',
+                                                        interval: parseInt(e.target.value)
+                                                    }
+                                                })}
+                                                className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm"
+                                            />
+                                        </div>
+                                    )}
                                 </div>
-                                <div>
-                                    <label className="block text-xs text-gray-500 mb-1">Interval (Every X)</label>
-                                    <input
-                                        type="number"
-                                        min="1"
-                                        max="365"
-                                        value={formData.recurring?.interval || 1}
-                                        onChange={(e) => setFormData({
-                                            ...formData,
-                                            recurring: {
-                                                frequency: formData.recurring?.frequency || 'daily',
-                                                interval: parseInt(e.target.value)
-                                            }
-                                        })}
-                                        className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm"
-                                    />
-                                </div>
-                            </div>
+
+                                {/* Bi-annual / Seasonal month selection */}
+                                {(formData.recurring?.frequency === 'bi-annual' || formData.recurring?.frequency === 'seasonal') && (
+                                    <div className="ml-6 mt-3">
+                                        <label className="block text-xs text-gray-500 mb-2">Select Months</label>
+                                        <div className="grid grid-cols-4 gap-2">
+                                            {['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].map((month, idx) => {
+                                                const monthNum = idx + 1;
+                                                const isSelected = formData.recurring?.seasonalMonths?.includes(monthNum);
+                                                return (
+                                                    <button
+                                                        key={month}
+                                                        type="button"
+                                                        onClick={() => {
+                                                            const current = formData.recurring?.seasonalMonths || [];
+                                                            const updated = isSelected
+                                                                ? current.filter(m => m !== monthNum)
+                                                                : [...current, monthNum];
+                                                            setFormData({
+                                                                ...formData,
+                                                                recurring: {
+                                                                    ...formData.recurring!,
+                                                                    seasonalMonths: updated.sort((a, b) => a - b)
+                                                                }
+                                                            });
+                                                        }}
+                                                        className={`px-2 py-1 rounded text-xs transition-colors ${isSelected
+                                                                ? 'bg-orange-500 text-white'
+                                                                : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                                                            }`}
+                                                    >
+                                                        {month}
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Annual month selection */}
+                                {formData.recurring?.frequency === 'annual' && (
+                                    <div className="ml-6 mt-3">
+                                        <label className="block text-xs text-gray-500 mb-1">Select Month</label>
+                                        <select
+                                            value={formData.recurring?.specificMonth || 1}
+                                            onChange={(e) => setFormData({
+                                                ...formData,
+                                                recurring: {
+                                                    ...formData.recurring!,
+                                                    specificMonth: parseInt(e.target.value)
+                                                }
+                                            })}
+                                            className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm"
+                                        >
+                                            <option value="1">January</option>
+                                            <option value="2">February</option>
+                                            <option value="3">March</option>
+                                            <option value="4">April</option>
+                                            <option value="5">May</option>
+                                            <option value="6">June</option>
+                                            <option value="7">July</option>
+                                            <option value="8">August</option>
+                                            <option value="9">September</option>
+                                            <option value="10">October</option>
+                                            <option value="11">November</option>
+                                            <option value="12">December</option>
+                                        </select>
+                                    </div>
+                                )}
+                            </>
                         )}
                     </div>
 
