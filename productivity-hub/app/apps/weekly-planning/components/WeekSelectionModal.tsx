@@ -36,7 +36,9 @@ export function WeekSelectionModal({ onClose, onSelect }: WeekSelectionModalProp
                             const [year, month, day] = date.split('-').map(Number);
                             const selectedDate = new Date(year, month - 1, day);
                             selectedDate.setHours(0, 0, 0, 0);
-                            onSelect(selectedDate.getTime());
+                            const timestamp = selectedDate.getTime();
+                            console.log('[WeekSelectionModal] Selected date:', { date, timestamp, readable: new Date(timestamp) });
+                            onSelect(timestamp);
                         }}
                         className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
                     >

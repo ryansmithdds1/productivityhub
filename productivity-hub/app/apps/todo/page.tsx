@@ -40,6 +40,8 @@ export default function TodoApp() {
 
     const loadTasks = async () => {
         const loadedTasks = await storage.getTasks();
+        console.log('[TodoApp] Loaded tasks:', loadedTasks.map(t => ({ id: t.id, title: t.title, dueDate: t.dueDate, readable: new Date(t.dueDate) })));
+        console.log('[TodoApp] Current date filter:', { currentDate, readable: new Date(currentDate) });
         setTasks(loadedTasks);
         loadedTasks.forEach(scheduleNotification);
     };
