@@ -294,6 +294,13 @@ export default function WeeklyPlanningPage() {
                     onClose={() => setSelectedPlan(null)}
                 />
             )}
+
+            {showWeekSelection && (
+                <WeekSelectionModal
+                    onClose={() => setShowWeekSelection(false)}
+                    onSelect={handleWeekSelected}
+                />
+            )}
         </DashboardLayout>
     );
 }
