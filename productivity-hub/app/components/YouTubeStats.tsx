@@ -129,7 +129,7 @@ export function YouTubeStats({ channelId, apiKey: initialApiKey }: { channelId: 
     if (!stats) return null;
 
     const formatNumber = (num: string) => {
-        return new Intl.NumberFormat('en-US', { notation: "compact", compactDisplay: "short" }).format(parseInt(num));
+        return new Intl.NumberFormat('en-US').format(parseInt(num));
     };
 
     return (
