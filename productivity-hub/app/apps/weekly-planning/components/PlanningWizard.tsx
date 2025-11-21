@@ -26,6 +26,7 @@ export function PlanningWizard({ onComplete, onCancel, initialPlan }: PlanningWi
     const [roadblocks, setRoadblocks] = useState('');
     const [commitment, setCommitment] = useState('');
     const [createdTasks, setCreatedTasks] = useState<string[]>([]); // Track task IDs
+    const [addedGoals, setAddedGoals] = useState<Set<string>>(new Set()); // Track which goals were added
 
     // Timer
     useEffect(() => {
@@ -77,12 +78,12 @@ export function PlanningWizard({ onComplete, onCancel, initialPlan }: PlanningWi
             if (response.ok) {
                 const task = await response.json();
                 setCreatedTasks(prev => [...prev, task.id]);
-                return true;
+                return task.id; // Return ID for tracking
             }
-            return false;
+            return null;
         } catch (error) {
             console.error('Failed to create task:', error);
-            return false;
+            return null;
         }
     };
 
@@ -127,9 +128,45 @@ export function PlanningWizard({ onComplete, onCancel, initialPlan }: PlanningWi
                         <textarea
                             value={brainDump}
                             onChange={(e) => setBrainDump(e.target.value)}
-                            className="w-full h-64 bg-gray-950 border border-gray-800 rounded-lg p-4 text-white focus:border-blue-500 focus:outline-none resize-none"
+                            className="w-full h-48 bg-gray-950 border border-gray-800 rounded-lg p-4 text-white focus:border-blue-500 focus:outline-none resize-none"
                             placeholder="Brain dump everything on your mind..."
                         />
+
+                        <div className="pt-4 border-t border-gray-800">
+                            <label className="block text-sm font-medium text-gray-300 mb-2">Quick Add to To-Do List</label>
+                            <div className="flex gap-2">
+                                <input
+                                    type="text"
+                                    placeholder="Type a task and press Enter..."
+                                    className="flex-1 bg-gray-950 border border-gray-800 rounded-lg px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+                                    onKeyDown={async (e) => {
+                                        if (e.key === 'Enter') {
+                                            const input = e.currentTarget;
+                                            if (input.value.trim()) {
+                                                const success = await createTask(input.value, 'personal');
+                                                if (success) {
+                                                    input.value = '';
+                                                }
+                                            }
+                                        }
+                                    }}
+                                />
+                                <button
+                                    className="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg text-sm font-medium transition-colors"
+                                    onClick={() => {
+                                        const input = document.querySelector('input[placeholder="Type a task and press Enter..."]') as HTMLInputElement;
+                                        if (input && input.value.trim()) {
+                                            createTask(input.value, 'personal').then(success => {
+                                                if (success) input.value = '';
+                                            });
+                                        }
+                                    }}
+                                >
+                                    Add Task
+                                </button>
+                            </div>
+                            <p className="text-xs text-gray-500 mt-1">Tasks added here will appear in your To-Do list immediately.</p>
+                        </div>
                     </div>
                 );
 
@@ -180,10 +217,19 @@ export function PlanningWizard({ onComplete, onCancel, initialPlan }: PlanningWi
                                 />
                                 {goal.trim() && (
                                     <button
-                                        onClick={() => createTask(goal, 'personal')}
-                                        className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium transition-colors whitespace-nowrap"
+                                        onClick={async () => {
+                                            const id = await createTask(goal, 'personal');
+                                            if (id) {
+                                                setAddedGoals(prev => new Set(prev).add(`spiritual-${i}`));
+                                            }
+                                        }}
+                                        disabled={addedGoals.has(`spiritual-${i}`)}
+                                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${addedGoals.has(`spiritual-${i}`)
+                                            ? 'bg-green-900/50 text-green-400 cursor-default'
+                                            : 'bg-green-600 hover:bg-green-700 text-white'
+                                            }`}
                                     >
-                                        + Add to To-Do
+                                        {addedGoals.has(`spiritual-${i}`) ? '✅ Added' : '+ Add to To-Do'}
                                     </button>
                                 )}
                             </div>
@@ -212,10 +258,19 @@ export function PlanningWizard({ onComplete, onCancel, initialPlan }: PlanningWi
                                 />
                                 {goal.trim() && (
                                     <button
-                                        onClick={() => createTask(goal, 'personal')}
-                                        className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium transition-colors whitespace-nowrap"
+                                        onClick={async () => {
+                                            const id = await createTask(goal, 'personal');
+                                            if (id) {
+                                                setAddedGoals(prev => new Set(prev).add(`personal-${i}`));
+                                            }
+                                        }}
+                                        disabled={addedGoals.has(`personal-${i}`)}
+                                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${addedGoals.has(`personal-${i}`)
+                                            ? 'bg-green-900/50 text-green-400 cursor-default'
+                                            : 'bg-green-600 hover:bg-green-700 text-white'
+                                            }`}
                                     >
-                                        + Add to To-Do
+                                        {addedGoals.has(`personal-${i}`) ? '✅ Added' : '+ Add to To-Do'}
                                     </button>
                                 )}
                             </div>
@@ -244,10 +299,19 @@ export function PlanningWizard({ onComplete, onCancel, initialPlan }: PlanningWi
                                 />
                                 {goal.trim() && (
                                     <button
-                                        onClick={() => createTask(goal, 'work')}
-                                        className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium transition-colors whitespace-nowrap"
+                                        onClick={async () => {
+                                            const id = await createTask(goal, 'work');
+                                            if (id) {
+                                                setAddedGoals(prev => new Set(prev).add(`business-${i}`));
+                                            }
+                                        }}
+                                        disabled={addedGoals.has(`business-${i}`)}
+                                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${addedGoals.has(`business-${i}`)
+                                            ? 'bg-green-900/50 text-green-400 cursor-default'
+                                            : 'bg-green-600 hover:bg-green-700 text-white'
+                                            }`}
                                     >
-                                        + Add to To-Do
+                                        {addedGoals.has(`business-${i}`) ? '✅ Added' : '+ Add to To-Do'}
                                     </button>
                                 )}
                             </div>
@@ -276,10 +340,19 @@ export function PlanningWizard({ onComplete, onCancel, initialPlan }: PlanningWi
                                 />
                                 {goal.trim() && (
                                     <button
-                                        onClick={() => createTask(goal, 'content')}
-                                        className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium transition-colors whitespace-nowrap"
+                                        onClick={async () => {
+                                            const id = await createTask(goal, 'content');
+                                            if (id) {
+                                                setAddedGoals(prev => new Set(prev).add(`content-${i}`));
+                                            }
+                                        }}
+                                        disabled={addedGoals.has(`content-${i}`)}
+                                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${addedGoals.has(`content-${i}`)
+                                                ? 'bg-green-900/50 text-green-400 cursor-default'
+                                                : 'bg-green-600 hover:bg-green-700 text-white'
+                                            }`}
                                     >
-                                        + Add to To-Do
+                                        {addedGoals.has(`content-${i}`) ? '✅ Added' : '+ Add to To-Do'}
                                     </button>
                                 )}
                             </div>
