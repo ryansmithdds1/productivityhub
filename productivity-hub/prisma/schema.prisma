@@ -83,3 +83,57 @@ model HookpointScript {
   @@map("hookpoint_scripts")
 }
 
+
+model Exercise {
+  id          String   @id @default(cuid())
+  name        String
+  category    String   // Push, Pull, Legs, Core
+  defaultSets Int      @default(3)
+  defaultReps Int      @default(10)
+  createdAt   BigInt
+  updatedAt   BigInt
+
+  workoutExercises WorkoutExercise[]
+
+  @@map("exercises")
+}
+
+model Workout {
+  id        String   @id @default(cuid())
+  name      String   // e.g. "Push A"
+  date      BigInt
+  duration  Int?     // in minutes
+  notes     String?
+  createdAt BigInt
+  updatedAt BigInt
+
+  exercises WorkoutExercise[]
+
+  @@map("workouts")
+}
+
+model WorkoutExercise {
+  id         String   @id @default(cuid())
+  workoutId  String
+  exerciseId String
+  order      Int      @default(0)
+
+  workout    Workout  @relation(fields: [workoutId], references: [id], onDelete: Cascade)
+  exercise   Exercise @relation(fields: [exerciseId], references: [id])
+  sets       Set[]
+
+  @@map("workout_exercises")
+}
+
+model Set {
+  id                String   @id @default(cuid())
+  workoutExerciseId String
+  reps              Int
+  weight            Float
+  type              String   @default("working") // warmup, working
+  completed         Boolean  @default(false)
+
+  workoutExercise   WorkoutExercise @relation(fields: [workoutExerciseId], references: [id], onDelete: Cascade)
+
+  @@map("sets")
+}
