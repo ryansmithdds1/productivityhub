@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Calendar, Zap, Lightbulb, Stethoscope, Bot, Settings, User, LogOut, ListTodo } from 'lucide-react';
+import { LayoutDashboard, Calendar, Zap, Lightbulb, Stethoscope, Bot, Settings, User, LogOut, ListTodo, Users, ExternalLink } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface NavItem {
@@ -88,6 +88,25 @@ export function Sidebar() {
                             </Link>
                         );
                     })}
+                </div>
+
+                {/* Helpful Links */}
+                <div className="mt-8">
+                    <h3 className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+                        Helpful Links
+                    </h3>
+                    <div className="space-y-1">
+                        <a
+                            href="https://app.editingmachine.com/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition-all group"
+                        >
+                            <Users size={20} className="group-hover:text-blue-400 transition-colors" />
+                            <span className="flex-1 text-sm font-medium">Editing Team</span>
+                            <ExternalLink size={14} className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                        </a>
+                    </div>
                 </div>
             </nav>
 
