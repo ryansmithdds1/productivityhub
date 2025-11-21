@@ -7,7 +7,7 @@ import { DayPlanner } from './components/DayPlanner';
 import { ListView } from './components/ListView';
 import { TaskModal } from './components/TaskModal';
 import { storage } from './lib/storage';
-import { getStartOfDay } from './lib/utils';
+import { getStartOfDay, requestNotificationPermission, scheduleNotification } from './lib/utils';
 import type { Task } from './types';
 
 export default function TodoApp() {
@@ -18,6 +18,7 @@ export default function TodoApp() {
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
     useEffect(() => {
+        requestNotificationPermission();
         loadTasks();
 
         // Auto-switch to list view on mobile
@@ -40,6 +41,7 @@ export default function TodoApp() {
     const loadTasks = async () => {
         const loadedTasks = await storage.getTasks();
         setTasks(loadedTasks);
+        loadedTasks.forEach(scheduleNotification);
     };
 
     const goToPreviousDay = () => {

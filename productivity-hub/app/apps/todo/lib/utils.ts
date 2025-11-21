@@ -120,3 +120,42 @@ export function getPriorityColor(priority: string): string {
     };
     return colors[priority as keyof typeof colors] || colors.low;
 }
+
+export function requestNotificationPermission() {
+    if (!('Notification' in window)) {
+        console.log('This browser does not support desktop notification');
+        return;
+    }
+
+    if (Notification.permission !== 'denied' && Notification.permission !== 'granted') {
+        Notification.requestPermission();
+    }
+}
+
+export function scheduleNotification(task: Task) {
+    if (!('Notification' in window) || Notification.permission !== 'granted') {
+        return;
+    }
+
+    // Only schedule if task has a time block
+    if (!task.timeBlock?.startTime) return;
+
+    const [hours, minutes] = task.timeBlock.startTime.split(':').map(Number);
+    const taskTime = new Date(task.dueDate);
+    taskTime.setHours(hours, minutes, 0, 0);
+
+    const now = new Date();
+    const timeUntilTask = taskTime.getTime() - now.getTime();
+
+    // Schedule 10 minutes before
+    const notificationTime = timeUntilTask - (10 * 60 * 1000);
+
+    if (notificationTime > 0) {
+        setTimeout(() => {
+            new Notification(`Upcoming Task: ${task.title}`, {
+                body: `Starting in 10 minutes`,
+                icon: '/favicon.ico'
+            });
+        }, notificationTime);
+    }
+}

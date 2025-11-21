@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Save, Sparkles, Wand2, ArrowLeft, Trash2, Play, Check, Loader2 } from 'lucide-react';
 import { storage } from '../lib/storage';
 import { GeminiService } from '../lib/gemini';
@@ -36,6 +36,31 @@ export function Editor({ script, initialHook, initialCategory, onBack, onSaved }
     const [isGenerating, setIsGenerating] = useState(false);
     const [isPolishing, setIsPolishing] = useState(false);
     const [saved, setSaved] = useState(false);
+    const [scripts, setScripts] = useState<Script[]>([]);
+    const [selectedScriptId, setSelectedScriptId] = useState<string>('');
+
+    useEffect(() => {
+        loadScripts();
+    }, []);
+
+    const loadScripts = async () => {
+        const loadedScripts = await storage.getScripts();
+        setScripts(loadedScripts);
+    };
+
+    const handleScriptSelect = (scriptId: string) => {
+        const selected = scripts.find(s => s.id === scriptId);
+        if (selected) {
+            setSelectedScriptId(scriptId);
+            setTitle(selected.title);
+            setTopic(selected.topic);
+            setCategory(selected.category);
+            setHook(selected.hook);
+            setBody(selected.body);
+            setCta(selected.cta);
+            setVisuals(selected.visuals);
+        }
+    };
 
     const geminiService = new GeminiService(storage.getApiKey());
 
@@ -232,6 +257,22 @@ export function Editor({ script, initialHook, initialCategory, onBack, onSaved }
                         <h2 className="text-lg font-semibold text-gray-100 mb-4">Script Details</h2>
 
                         <div className="space-y-4">
+                            {/* Script Selector */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-300 mb-2">Load Existing Script</label>
+                                <select
+                                    value={selectedScriptId}
+                                    onChange={(e) => handleScriptSelect(e.target.value)}
+                                    className="w-full px-4 py-3 bg-gray-950 border border-gray-700 rounded-lg text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
+                                >
+                                    <option value="">-- Select a script to load --</option>
+                                    {scripts.map(s => (
+                                        <option key={s.id} value={s.id}>
+                                            {s.title || 'Untitled'} ({new Date(s.updatedAt).toLocaleDateString()})
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-300 mb-2">Title</label>
                                 <input
