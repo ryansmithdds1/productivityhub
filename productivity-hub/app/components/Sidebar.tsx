@@ -16,6 +16,7 @@ interface NavItem {
 const navItems: NavItem[] = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
     { name: 'To-Do List', href: '/apps/todo', icon: ListTodo },
+    { name: 'Weekly Planning', href: '/apps/weekly-planning', icon: Calendar },
     { name: 'Content Calendar', href: '/apps/content-calendar', icon: Calendar },
     { name: 'Short Video Creator', href: '/apps/hookpoint', icon: Zap },
     { name: 'Workout Tracker', href: '/apps/workout', icon: Dumbbell },

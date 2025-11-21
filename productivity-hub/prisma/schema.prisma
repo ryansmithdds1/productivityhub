@@ -137,3 +137,18 @@ model Set {
 
   @@map("sets")
 }
+
+model WeeklyPlan {
+  id          String  @id @default(cuid())
+  weekOf      BigInt  // Start date of the week
+  status      String  @default("in-progress") // in-progress, completed
+  reflections Json?   // Step 2: wins, challenges
+  goals       Json?   // Steps 3-6: spiritual, personal, business, content
+  roadblocks  String? // Step 7: anticipated issues
+  commitment  String? // Step 8: summary and mid-week check-in
+  createdAt   BigInt
+  updatedAt   BigInt
+  completedAt BigInt?
+
+  @@map("weekly_plans")
+}
