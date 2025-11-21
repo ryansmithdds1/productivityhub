@@ -120,7 +120,6 @@ export default function WeeklyPlanningPage() {
     };
 
     const handleWeekSelected = (date: number) => {
-        console.log('[WeeklyPlanningPage] Week selected:', { date, readable: new Date(date) });
         setPlanningDate(date);
         setShowWeekSelection(false);
         setIsPlanning(true);

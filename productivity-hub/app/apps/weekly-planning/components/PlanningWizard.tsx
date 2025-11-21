@@ -86,7 +86,6 @@ export function PlanningWizard({ onComplete, onCancel, initialPlan, weekOf }: Pl
                     updatedAt: Date.now()
                 })
             });
-            console.log('Creating task with payload:', { title, category, dueDate: taskDueDate, weekOf });
 
             if (response.ok) {
                 const task = await response.json();
@@ -94,8 +93,6 @@ export function PlanningWizard({ onComplete, onCancel, initialPlan, weekOf }: Pl
                 setToast({ message: 'Task added to To-Do List', type: 'success' });
                 return task.id; // Return ID for tracking
             }
-            const errorData = await response.json();
-            console.error('Failed to create task:', errorData);
             setToast({ message: 'Failed to add task', type: 'error' });
             return null;
         } catch (error) {
