@@ -5,7 +5,6 @@ import { redirect } from 'next/navigation';
 import { DashboardLayout } from '@/app/components/DashboardLayout';
 import { TodoDashboardWidget } from '@/app/components/TodoDashboardWidget';
 import { YouTubeStats } from '@/app/components/YouTubeStats';
-import { SocialStatCard } from '@/app/components/SocialStatCard';
 import { YouTubeLatestVideos } from '@/app/components/YouTubeLatestVideos';
 
 export default async function DashboardPage() {
@@ -30,28 +29,11 @@ export default async function DashboardPage() {
                 {/* Today's Tasks */}
                 <TodoDashboardWidget />
 
-                {/* Social Stats Grid */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <YouTubeStats
-                        channelId="UCH8ogybb7nap82QuKpnpbZg"
-                        apiKey="AIzaSyC8OSuZfHmCrjbH8RIPG-fM7Oq1kho7q_4"
-                    />
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <SocialStatCard
-                            platform="instagram"
-                            username="ryansmithdds"
-                            initialFollowers="12.5K"
-                            color="text-pink-500"
-                        />
-                        <SocialStatCard
-                            platform="tiktok"
-                            username="ryansmithdds"
-                            initialFollowers="45.2K"
-                            color="text-cyan-400"
-                        />
-                    </div>
-                </div>
+                {/* YouTube Stats */}
+                <YouTubeStats
+                    channelId="UCH8ogybb7nap82QuKpnpbZg"
+                    apiKey="AIzaSyC8OSuZfHmCrjbH8RIPG-fM7Oq1kho7q_4"
+                />
 
                 {/* Latest Videos */}
                 <YouTubeLatestVideos

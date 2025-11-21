@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Calendar, Zap, Lightbulb, Stethoscope, Bot, Settings, User, LogOut, ListTodo, Users, ExternalLink } from 'lucide-react';
+import { LayoutDashboard, Calendar, Zap, Settings, User, LogOut, ListTodo, Users, ExternalLink } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface NavItem {
@@ -18,9 +18,6 @@ const navItems: NavItem[] = [
     { name: 'To-Do List', href: '/apps/todo', icon: ListTodo },
     { name: 'Content Calendar', href: '/apps/content-calendar', icon: Calendar },
     { name: 'Short Video Creator', href: '/apps/hookpoint', icon: Zap },
-    { name: 'Idea Brainstorm', href: '/apps/ideas', icon: Lightbulb, badge: 'Soon', disabled: true },
-    { name: 'Practice Manager', href: '/apps/practice', icon: Stethoscope, badge: 'Soon', disabled: true },
-    { name: 'AI Assistant', href: '/apps/ai-assistant', icon: Bot, badge: 'Soon', disabled: true },
 ];
 
 export function Sidebar() {
