@@ -25,6 +25,7 @@ export function PlanningWizard({ onComplete, onCancel, initialPlan }: PlanningWi
     const [contentGoals, setContentGoals] = useState<string[]>(['']);
     const [roadblocks, setRoadblocks] = useState('');
     const [commitment, setCommitment] = useState('');
+    const [createdTasks, setCreatedTasks] = useState<string[]>([]); // Track task IDs
 
     // Timer
     useEffect(() => {
@@ -56,6 +57,32 @@ export function PlanningWizard({ onComplete, onCancel, initialPlan }: PlanningWi
         if (currentStep > 0) {
             setCurrentStep(currentStep - 1);
             setStartTime(Date.now());
+        }
+    };
+
+    const createTask = async (title: string, category: 'work' | 'personal' | 'content' | 'health' | 'other') => {
+        try {
+            const response = await fetch('/api/tasks', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    title,
+                    category,
+                    priority: 'medium',
+                    dueDate: Date.now() + (7 * 24 * 60 * 60 * 1000), // Due in 1 week
+                    completed: false
+                })
+            });
+
+            if (response.ok) {
+                const task = await response.json();
+                setCreatedTasks(prev => [...prev, task.id]);
+                return true;
+            }
+            return false;
+        } catch (error) {
+            console.error('Failed to create task:', error);
+            return false;
         }
     };
 
@@ -143,14 +170,23 @@ export function PlanningWizard({ onComplete, onCancel, initialPlan }: PlanningWi
                     <div className="space-y-4">
                         <p className="text-gray-400">Plan your spiritual activities and service goals for the week.</p>
                         {spiritualGoals.map((goal, i) => (
-                            <input
-                                key={i}
-                                type="text"
-                                value={goal}
-                                onChange={(e) => updateGoalField(i, e.target.value, setSpiritualGoals)}
-                                className="w-full bg-gray-950 border border-gray-800 rounded-lg px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
-                                placeholder="e.g., Temple visit with fasting on Friday"
-                            />
+                            <div key={i} className="flex gap-2">
+                                <input
+                                    type="text"
+                                    value={goal}
+                                    onChange={(e) => updateGoalField(i, e.target.value, setSpiritualGoals)}
+                                    className="flex-1 bg-gray-950 border border-gray-800 rounded-lg px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+                                    placeholder="e.g., Temple visit with fasting on Friday"
+                                />
+                                {goal.trim() && (
+                                    <button
+                                        onClick={() => createTask(goal, 'personal')}
+                                        className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium transition-colors whitespace-nowrap"
+                                    >
+                                        + Add to To-Do
+                                    </button>
+                                )}
+                            </div>
                         ))}
                         <button
                             onClick={() => addGoalField(setSpiritualGoals)}
@@ -166,14 +202,23 @@ export function PlanningWizard({ onComplete, onCancel, initialPlan }: PlanningWi
                     <div className="space-y-4">
                         <p className="text-gray-400">Set personal and family objectives for the week.</p>
                         {personalGoals.map((goal, i) => (
-                            <input
-                                key={i}
-                                type="text"
-                                value={goal}
-                                onChange={(e) => updateGoalField(i, e.target.value, setPersonalGoals)}
-                                className="w-full bg-gray-950 border border-gray-800 rounded-lg px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
-                                placeholder="e.g., Date night Tuesday, Family walk Wednesday"
-                            />
+                            <div key={i} className="flex gap-2">
+                                <input
+                                    type="text"
+                                    value={goal}
+                                    onChange={(e) => updateGoalField(i, e.target.value, setPersonalGoals)}
+                                    className="flex-1 bg-gray-950 border border-gray-800 rounded-lg px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+                                    placeholder="e.g., Date night Tuesday, Family walk Wednesday"
+                                />
+                                {goal.trim() && (
+                                    <button
+                                        onClick={() => createTask(goal, 'personal')}
+                                        className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium transition-colors whitespace-nowrap"
+                                    >
+                                        + Add to To-Do
+                                    </button>
+                                )}
+                            </div>
                         ))}
                         <button
                             onClick={() => addGoalField(setPersonalGoals)}
@@ -189,14 +234,23 @@ export function PlanningWizard({ onComplete, onCancel, initialPlan }: PlanningWi
                     <div className="space-y-4">
                         <p className="text-gray-400">Define your business and professional goals for the week.</p>
                         {businessGoals.map((goal, i) => (
-                            <input
-                                key={i}
-                                type="text"
-                                value={goal}
-                                onChange={(e) => updateGoalField(i, e.target.value, setBusinessGoals)}
-                                className="w-full bg-gray-950 border border-gray-800 rounded-lg px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
-                                placeholder="e.g., Complete CE course, Review staffing Monday"
-                            />
+                            <div key={i} className="flex gap-2">
+                                <input
+                                    type="text"
+                                    value={goal}
+                                    onChange={(e) => updateGoalField(i, e.target.value, setBusinessGoals)}
+                                    className="flex-1 bg-gray-950 border border-gray-800 rounded-lg px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+                                    placeholder="e.g., Complete CE course, Review staffing Monday"
+                                />
+                                {goal.trim() && (
+                                    <button
+                                        onClick={() => createTask(goal, 'work')}
+                                        className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium transition-colors whitespace-nowrap"
+                                    >
+                                        + Add to To-Do
+                                    </button>
+                                )}
+                            </div>
                         ))}
                         <button
                             onClick={() => addGoalField(setBusinessGoals)}
@@ -212,14 +266,23 @@ export function PlanningWizard({ onComplete, onCancel, initialPlan }: PlanningWi
                     <div className="space-y-4">
                         <p className="text-gray-400">Plan your content for the week: 2 YouTube videos and 5 shorts.</p>
                         {contentGoals.map((goal, i) => (
-                            <input
-                                key={i}
-                                type="text"
-                                value={goal}
-                                onChange={(e) => updateGoalField(i, e.target.value, setContentGoals)}
-                                className="w-full bg-gray-950 border border-gray-800 rounded-lg px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
-                                placeholder="e.g., YouTube: How to Fix Overbite | Short: Quick Flossing Tip"
-                            />
+                            <div key={i} className="flex gap-2">
+                                <input
+                                    type="text"
+                                    value={goal}
+                                    onChange={(e) => updateGoalField(i, e.target.value, setContentGoals)}
+                                    className="flex-1 bg-gray-950 border border-gray-800 rounded-lg px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+                                    placeholder="e.g., YouTube: How to Fix Overbite | Short: Quick Flossing Tip"
+                                />
+                                {goal.trim() && (
+                                    <button
+                                        onClick={() => createTask(goal, 'content')}
+                                        className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium transition-colors whitespace-nowrap"
+                                    >
+                                        + Add to To-Do
+                                    </button>
+                                )}
+                            </div>
                         ))}
                         <button
                             onClick={() => addGoalField(setContentGoals)}
@@ -246,6 +309,13 @@ export function PlanningWizard({ onComplete, onCancel, initialPlan }: PlanningWi
             case 7: // Close & Commit
                 return (
                     <div className="space-y-4">
+                        {createdTasks.length > 0 && (
+                            <div className="bg-green-900/20 border border-green-500/30 rounded-lg p-4 mb-4">
+                                <p className="text-green-400 text-sm font-medium">
+                                    ✅ Created {createdTasks.length} task(s) in your To-Do List
+                                </p>
+                            </div>
+                        )}
                         <p className="text-gray-400">Summarize your week and set a mid-week check-in reminder.</p>
                         <textarea
                             value={commitment}
