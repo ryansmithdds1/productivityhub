@@ -1,10 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Plus, ChevronLeft, ChevronRight, ListTodo as ListIcon, LayoutGrid, List } from 'lucide-react';
+import { Plus, ChevronLeft, ChevronRight, ListTodo as ListIcon, LayoutGrid, List, Calendar } from 'lucide-react';
 import { DashboardLayout } from '@/app/components/DashboardLayout';
 import { DayPlanner } from './components/DayPlanner';
 import { ListView } from './components/ListView';
+import { MaintenancePlanner } from './components/MaintenancePlanner';
 import { TaskModal } from './components/TaskModal';
 import { storage } from './lib/storage';
 import { getStartOfDay, requestNotificationPermission, scheduleNotification } from './lib/utils';
@@ -16,6 +17,7 @@ export default function TodoApp() {
     const [showTaskModal, setShowTaskModal] = useState(false);
     const [editingTask, setEditingTask] = useState<Task | undefined>(undefined);
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+    const [mainView, setMainView] = useState<'planner' | 'maintenance'>('planner');
 
     useEffect(() => {
         requestNotificationPermission();
@@ -86,102 +88,137 @@ export default function TodoApp() {
                     </div>
 
                     {/* View Toggle */}
-                    <div className="flex bg-gray-800 rounded-lg p-1 self-start md:self-auto">
-                        <button
-                            onClick={() => setViewMode('grid')}
-                            className={`p-2 rounded-md flex items-center gap-2 transition-colors ${viewMode === 'grid' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-gray-300'}`}
-                        >
-                            <LayoutGrid size={18} />
-                            <span className="text-sm font-medium hidden md:inline">Grid</span>
-                        </button>
-                        <button
-                            onClick={() => setViewMode('list')}
-                            className={`p-2 rounded-md flex items-center gap-2 transition-colors ${viewMode === 'list' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-gray-300'}`}
-                        >
-                            <List size={18} />
-                            <span className="text-sm font-medium hidden md:inline">List</span>
-                        </button>
+                    <div className="flex gap-2">
+                        {/* Main View Toggle */}
+                        <div className="flex bg-gray-800 rounded-lg p-1">
+                            <button
+                                onClick={() => setMainView('planner')}
+                                className={`px-3 py-2 rounded-md flex items-center gap-2 transition-colors ${mainView === 'planner' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-gray-300'}`}
+                            >
+                                <ListIcon size={18} />
+                                <span className="text-sm font-medium hidden md:inline">Day Planner</span>
+                            </button>
+                            <button
+                                onClick={() => setMainView('maintenance')}
+                                className={`px-3 py-2 rounded-md flex items-center gap-2 transition-colors ${mainView === 'maintenance' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-gray-300'}`}
+                            >
+                                <Calendar size={18} />
+                                <span className="text-sm font-medium hidden md:inline">Maintenance</span>
+                            </button>
+                        </div>
+
+                        {/* Grid/List Toggle (only for Day Planner) */}
+                        {mainView === 'planner' && (
+                            <div className="flex bg-gray-800 rounded-lg p-1">
+                                <button
+                                    onClick={() => setViewMode('grid')}
+                                    className={`p-2 rounded-md flex items-center gap-2 transition-colors ${viewMode === 'grid' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-gray-300'}`}
+                                >
+                                    <LayoutGrid size={18} />
+                                    <span className="text-sm font-medium hidden md:inline">Grid</span>
+                                </button>
+                                <button
+                                    onClick={() => setViewMode('list')}
+                                    className={`p-2 rounded-md flex items-center gap-2 transition-colors ${viewMode === 'list' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-gray-300'}`}
+                                >
+                                    <List size={18} />
+                                    <span className="text-sm font-medium hidden md:inline">List</span>
+                                </button>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
 
             {/* Main Content */}
             <div className="p-4 md:p-8">
-                {/* Date Navigation */}
-                <div className="flex flex-col md:flex-row items-center justify-between mb-6 gap-4">
-                    <div className="flex items-center gap-4 w-full md:w-auto justify-between md:justify-start">
-                        <button
-                            onClick={goToPreviousDay}
-                            className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
-                        >
-                            <ChevronLeft size={20} className="text-gray-400" />
-                        </button>
-                        <div className="text-center">
-                            <h2 className="text-lg md:text-xl font-semibold text-white">
-                                {new Date(currentDate).toLocaleDateString('en-US', {
-                                    weekday: 'long',
-                                    month: 'long',
-                                    day: 'numeric',
-                                    year: 'numeric'
-                                })}
-                            </h2>
-                        </div>
-                        <button
-                            onClick={goToNextDay}
-                            className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
-                        >
-                            <ChevronRight size={20} className="text-gray-400" />
-                        </button>
-                    </div>
-
-                    <div className="flex items-center gap-2 w-full md:w-auto">
-                        <button
-                            onClick={goToToday}
-                            className="flex-1 md:flex-none px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg transition-colors"
-                        >
-                            Today
-                        </button>
-                        <button
-                            onClick={() => setShowTaskModal(true)}
-                            className="flex-1 md:flex-none px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-colors flex items-center justify-center gap-2"
-                        >
-                            <Plus size={18} />
-                            <span className="hidden md:inline">New Task</span>
-                            <span className="md:hidden">New</span>
-                        </button>
-                    </div>
-                </div>
-
-                {/* View Content */}
-                {viewMode === 'grid' ? (
-                    <div className="hidden md:block">
-                        <DayPlanner
-                            date={currentDate}
-                            tasks={tasks}
-                            onTaskUpdate={handleTaskUpdate}
-                            onEditTask={handleEditTask}
-                        />
-                    </div>
-                ) : (
-                    <ListView
-                        date={currentDate}
+                {mainView === 'maintenance' ? (
+                    <MaintenancePlanner
                         tasks={tasks}
-                        onTaskUpdate={handleTaskUpdate}
-                        onEditTask={handleEditTask}
+                        onEditTask={(task) => {
+                            setEditingTask(task);
+                            setShowTaskModal(true);
+                        }}
                     />
-                )}
+                ) : (
+                    <>
+                        {/* Date Navigation */}
+                        <div className="flex flex-col md:flex-row items-center justify-between mb-6 gap-4">
+                            <div className="flex items-center gap-4 w-full md:w-auto justify-between md:justify-start">
+                                <button
+                                    onClick={goToPreviousDay}
+                                    className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
+                                >
+                                    <ChevronLeft size={20} className="text-gray-400" />
+                                </button>
+                                <div className="text-center">
+                                    <h2 className="text-lg md:text-xl font-semibold text-white">
+                                        {new Date(currentDate).toLocaleDateString('en-US', {
+                                            weekday: 'long',
+                                            month: 'long',
+                                            day: 'numeric',
+                                            year: 'numeric'
+                                        })}
+                                    </h2>
+                                </div>
+                                <button
+                                    onClick={goToNextDay}
+                                    className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
+                                >
+                                    <ChevronRight size={20} className="text-gray-400" />
+                                </button>
+                            </div>
 
-                {/* Mobile fallback for grid view if forced */}
-                {viewMode === 'grid' && (
-                    <div className="md:hidden text-center py-10">
-                        <p className="text-gray-400 mb-4">Grid view is optimized for desktop.</p>
-                        <button
-                            onClick={() => setViewMode('list')}
-                            className="text-orange-500 hover:underline"
-                        >
-                            Switch to List View
-                        </button>
-                    </div>
+                            <div className="flex items-center gap-2 w-full md:w-auto">
+                                <button
+                                    onClick={goToToday}
+                                    className="flex-1 md:flex-none px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg transition-colors"
+                                >
+                                    Today
+                                </button>
+                                <button
+                                    onClick={() => setShowTaskModal(true)}
+                                    className="flex-1 md:flex-none px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-colors flex items-center justify-center gap-2"
+                                >
+                                    <Plus size={18} />
+                                    <span className="hidden md:inline">New Task</span>
+                                    <span className="md:hidden">New</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* View Content */}
+                        {viewMode === 'grid' ? (
+                            <div className="hidden md:block">
+                                <DayPlanner
+                                    date={currentDate}
+                                    tasks={tasks}
+                                    onTaskUpdate={handleTaskUpdate}
+                                    onEditTask={handleEditTask}
+                                />
+                            </div>
+                        ) : (
+                            <ListView
+                                date={currentDate}
+                                tasks={tasks}
+                                onTaskUpdate={handleTaskUpdate}
+                                onEditTask={handleEditTask}
+                            />
+                        )}
+
+                        {/* Mobile fallback for grid view if forced */}
+                        {viewMode === 'grid' && (
+                            <div className="md:hidden text-center py-10">
+                                <p className="text-gray-400 mb-4">Grid view is optimized for desktop.</p>
+                                <button
+                                    onClick={() => setViewMode('list')}
+                                    className="text-orange-500 hover:underline"
+                                >
+                                    Switch to List View
+                                </button>
+                            </div>
+                        )}
+                    </>
                 )}
             </div>
 
