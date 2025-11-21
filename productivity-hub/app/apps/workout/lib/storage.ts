@@ -1,4 +1,4 @@
-import { Exercise, Workout } from './types';
+import { Exercise, Workout } from '../types';
 
 export const storage = {
     async getExercises(): Promise<Exercise[]> {
@@ -14,6 +14,21 @@ export const storage = {
             body: JSON.stringify(exercise),
         });
         return res.json();
+    },
+
+    async updateExercise(id: string, exercise: Partial<Exercise>): Promise<Exercise> {
+        const res = await fetch(`/api/exercises/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(exercise),
+        });
+        return res.json();
+    },
+
+    async deleteExercise(id: string): Promise<void> {
+        await fetch(`/api/exercises/${id}`, {
+            method: 'DELETE',
+        });
     },
 
     async getWorkouts(): Promise<Workout[]> {
