@@ -75,7 +75,7 @@ export function PlanningWizard({ onComplete, onCancel, initialPlan, weekOf }: Pl
                     title,
                     category,
                     priority: 'medium',
-                    dueDate: Date.now() + (7 * 24 * 60 * 60 * 1000), // Due in 1 week
+                    dueDate: weekOf, // Due on the start day of the selected week
                     completed: false,
                     createdAt: Date.now(),
                     updatedAt: Date.now()

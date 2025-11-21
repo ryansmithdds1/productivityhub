@@ -32,11 +32,11 @@ export function WeekSelectionModal({ onClose, onSelect }: WeekSelectionModalProp
                     </button>
                     <button
                         onClick={() => {
-                            // Create date at noon to avoid timezone issues shifting the day
-                            const selectedDate = new Date(date);
-                            // Add time component to ensure it's treated as local time or specific day
-                            const timestamp = selectedDate.getTime();
-                            onSelect(timestamp);
+                            // Create date using local time components to ensure it matches DayPlanner's getStartOfDay
+                            const [year, month, day] = date.split('-').map(Number);
+                            const selectedDate = new Date(year, month - 1, day);
+                            selectedDate.setHours(0, 0, 0, 0);
+                            onSelect(selectedDate.getTime());
                         }}
                         className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
                     >
