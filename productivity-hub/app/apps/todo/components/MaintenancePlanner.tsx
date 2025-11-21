@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Calendar, Home, Sprout, Tractor } from 'lucide-react';
+import { Calendar, Home, Sprout, Tractor, Plus } from 'lucide-react';
 import type { Task, Category } from '../types';
 import { getCategoryColor, getNextRecurrence } from '../lib/utils';
 
@@ -123,6 +123,14 @@ export function MaintenancePlanner({ tasks, onEditTask }: MaintenancePlannerProp
                         <p className="text-sm text-gray-400">Manage your home, property, and farm maintenance</p>
                     </div>
                 </div>
+                <button
+                    onClick={() => onEditTask(undefined as any)}
+                    className="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-colors flex items-center gap-2"
+                >
+                    <Plus size={18} />
+                    <span className="hidden md:inline">New Task</span>
+                    <span className="md:hidden">New</span>
+                </button>
             </div>
 
             {/* Category Tabs */}
@@ -130,8 +138,8 @@ export function MaintenancePlanner({ tasks, onEditTask }: MaintenancePlannerProp
                 <button
                     onClick={() => setSelectedCategory('all')}
                     className={`px-4 py-2 rounded-lg font-medium transition-colors ${selectedCategory === 'all'
-                            ? 'bg-orange-500 text-white'
-                            : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                        ? 'bg-orange-500 text-white'
+                        : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
                         }`}
                 >
                     All
@@ -139,8 +147,8 @@ export function MaintenancePlanner({ tasks, onEditTask }: MaintenancePlannerProp
                 <button
                     onClick={() => setSelectedCategory('home')}
                     className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${selectedCategory === 'home'
-                            ? 'bg-orange-500 text-white'
-                            : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                        ? 'bg-orange-500 text-white'
+                        : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
                         }`}
                 >
                     <Home size={16} />
@@ -149,8 +157,8 @@ export function MaintenancePlanner({ tasks, onEditTask }: MaintenancePlannerProp
                 <button
                     onClick={() => setSelectedCategory('property')}
                     className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${selectedCategory === 'property'
-                            ? 'bg-teal-500 text-white'
-                            : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                        ? 'bg-teal-500 text-white'
+                        : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
                         }`}
                 >
                     <Sprout size={16} />
@@ -159,8 +167,8 @@ export function MaintenancePlanner({ tasks, onEditTask }: MaintenancePlannerProp
                 <button
                     onClick={() => setSelectedCategory('farm')}
                     className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${selectedCategory === 'farm'
-                            ? 'bg-amber-500 text-white'
-                            : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                        ? 'bg-amber-500 text-white'
+                        : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
                         }`}
                 >
                     <Tractor size={16} />
