@@ -8,9 +8,10 @@ interface PlanningWizardProps {
     onComplete: (plan: WeeklyPlan) => void;
     onCancel: () => void;
     initialPlan?: WeeklyPlan;
+    weekOf: number;
 }
 
-export function PlanningWizard({ onComplete, onCancel, initialPlan }: PlanningWizardProps) {
+export function PlanningWizard({ onComplete, onCancel, initialPlan, weekOf }: PlanningWizardProps) {
     const [currentStep, setCurrentStep] = useState(0);
     const [startTime, setStartTime] = useState(Date.now());
     const [elapsedTime, setElapsedTime] = useState(0);
@@ -91,7 +92,7 @@ export function PlanningWizard({ onComplete, onCancel, initialPlan }: PlanningWi
 
     const handleComplete = () => {
         const plan: Partial<WeeklyPlan> = {
-            weekOf: Date.now(),
+            weekOf,
             status: 'completed',
             reflections: {
                 wins: wins.filter(w => w.trim()),
