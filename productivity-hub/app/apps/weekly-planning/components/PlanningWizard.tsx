@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Check, ChevronRight, ChevronLeft, Clock, Save } from 'lucide-react';
 import { PLANNING_STEPS, type WeeklyPlan } from '../types';
+import { Toast, type ToastType } from '@/app/components/Toast';
 
 interface PlanningWizardProps {
     onComplete: (plan: WeeklyPlan) => void;
@@ -15,6 +16,9 @@ export function PlanningWizard({ onComplete, onCancel, initialPlan, weekOf }: Pl
     const [currentStep, setCurrentStep] = useState(0);
     const [startTime, setStartTime] = useState(Date.now());
     const [elapsedTime, setElapsedTime] = useState(0);
+
+    // Toast state
+    const [toast, setToast] = useState<{ message: string; type: ToastType } | null>(null);
 
     // Form data
     const [brainDump, setBrainDump] = useState('');
@@ -81,11 +85,14 @@ export function PlanningWizard({ onComplete, onCancel, initialPlan, weekOf }: Pl
             if (response.ok) {
                 const task = await response.json();
                 setCreatedTasks(prev => [...prev, task.id]);
+                setToast({ message: 'Task added to To-Do List', type: 'success' });
                 return task.id; // Return ID for tracking
             }
+            setToast({ message: 'Failed to add task', type: 'error' });
             return null;
         } catch (error) {
             console.error('Failed to create task:', error);
+            setToast({ message: 'Error creating task', type: 'error' });
             return null;
         }
     };
@@ -470,6 +477,14 @@ export function PlanningWizard({ onComplete, onCancel, initialPlan, weekOf }: Pl
                     </button>
                 </div>
             </div>
+            {/* Toast Notification */}
+            {toast && (
+                <Toast
+                    message={toast.message}
+                    type={toast.type}
+                    onClose={() => setToast(null)}
+                />
+            )}
         </div>
     );
 }
