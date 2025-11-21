@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Calendar, Zap, Settings, User, LogOut, ListTodo, Users, ExternalLink, Dumbbell } from 'lucide-react';
+import { LayoutDashboard, Calendar, Zap, Settings, User, LogOut, ListTodo, Users, ExternalLink, Dumbbell, Apple } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface NavItem {
@@ -19,6 +19,7 @@ const navItems: NavItem[] = [
     { name: 'Content Calendar', href: '/apps/content-calendar', icon: Calendar },
     { name: 'Short Video Creator', href: '/apps/hookpoint', icon: Zap },
     { name: 'Workout Tracker', href: '/apps/workout', icon: Dumbbell },
+    { name: 'Diet Tracker', href: '/apps/diet', icon: Apple },
 ];
 
 export function Sidebar() {
