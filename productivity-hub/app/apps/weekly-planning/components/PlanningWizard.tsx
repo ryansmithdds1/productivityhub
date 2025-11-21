@@ -68,6 +68,11 @@ export function PlanningWizard({ onComplete, onCancel, initialPlan, weekOf }: Pl
 
     const createTask = async (title: string, category: 'work' | 'personal' | 'content' | 'health' | 'other') => {
         try {
+            // Validate weekOf is a valid timestamp, fallback to current time
+            const taskDueDate = typeof weekOf === 'number' && !isNaN(weekOf) && weekOf > 0
+                ? weekOf
+                : new Date().setHours(0, 0, 0, 0);
+
             const response = await fetch('/api/tasks', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -75,12 +80,13 @@ export function PlanningWizard({ onComplete, onCancel, initialPlan, weekOf }: Pl
                     title,
                     category,
                     priority: 'medium',
-                    dueDate: weekOf, // Due on the start day of the selected week
+                    dueDate: taskDueDate,
                     completed: false,
                     createdAt: Date.now(),
                     updatedAt: Date.now()
                 })
             });
+            console.log('Creating task with payload:', { title, category, dueDate: taskDueDate, weekOf });
 
             if (response.ok) {
                 const task = await response.json();
@@ -88,6 +94,8 @@ export function PlanningWizard({ onComplete, onCancel, initialPlan, weekOf }: Pl
                 setToast({ message: 'Task added to To-Do List', type: 'success' });
                 return task.id; // Return ID for tracking
             }
+            const errorData = await response.json();
+            console.error('Failed to create task:', errorData);
             setToast({ message: 'Failed to add task', type: 'error' });
             return null;
         } catch (error) {

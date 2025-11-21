@@ -28,17 +28,23 @@ export async function POST(request: Request) {
         const body = await request.json();
         const { id, subtasks, timeBlock, recurring, ...data } = body;
 
-        // Build payload with proper type conversions
+        // Build payload with proper type conversions and validation
         const payload: any = {
             title: data.title,
             description: data.description || null,
-            dueDate: BigInt(data.dueDate),
+            dueDate: data.dueDate && !isNaN(data.dueDate) && data.dueDate > 0
+                ? BigInt(data.dueDate)
+                : BigInt(Date.now()),
             priority: data.priority,
             category: data.category,
             completed: data.completed || false,
             completedAt: data.completedAt ? BigInt(data.completedAt) : null,
-            createdAt: BigInt(data.createdAt),
-            updatedAt: BigInt(data.updatedAt),
+            createdAt: data.createdAt && !isNaN(data.createdAt)
+                ? BigInt(data.createdAt)
+                : BigInt(Date.now()),
+            updatedAt: data.updatedAt && !isNaN(data.updatedAt)
+                ? BigInt(data.updatedAt)
+                : BigInt(Date.now()),
         };
 
         // Add JSON fields only if they exist
@@ -66,6 +72,10 @@ export async function POST(request: Request) {
         return NextResponse.json(serialize(task));
     } catch (error) {
         console.error('Error creating task:', error);
+        // Log the full error details
+        if (error instanceof Error) {
+            console.error('Stack:', error.stack);
+        }
         return NextResponse.json({
             error: 'Failed to create task',
             details: error instanceof Error ? error.message : 'Unknown error'
