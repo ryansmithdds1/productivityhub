@@ -65,7 +65,7 @@ export default function WorkoutApp() {
                 </div>
 
                 {/* Quick Start */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     <button
                         onClick={() => startWorkout('Push Day')}
                         className="group bg-gradient-to-br from-blue-600/20 to-blue-800/20 border border-blue-500/30 hover:border-blue-400 p-6 rounded-xl text-left transition-all hover:scale-[1.02]"
@@ -98,6 +98,17 @@ export default function WorkoutApp() {
                         <h3 className="text-xl font-bold text-white mb-1">Leg Day</h3>
                         <p className="text-sm text-gray-400">Quads, Hamstrings, Calves</p>
                     </button>
+
+                    <Link
+                        href="/apps/workout/progress"
+                        className="group bg-gradient-to-br from-green-600/20 to-green-800/20 border border-green-500/30 hover:border-green-400 p-6 rounded-xl text-left transition-all hover:scale-[1.02]"
+                    >
+                        <div className="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center mb-4 group-hover:bg-green-500/30 transition-colors">
+                            <TrendingUp className="text-green-400" size={24} />
+                        </div>
+                        <h3 className="text-xl font-bold text-white mb-1">View Progress</h3>
+                        <p className="text-sm text-gray-400">Track your strength gains</p>
+                    </Link>
                 </div>
 
                 {/* Recent History */}
