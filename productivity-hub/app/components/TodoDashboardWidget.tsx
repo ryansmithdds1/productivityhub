@@ -109,7 +109,7 @@ export function TodoDashboardWidget() {
                 <div className="flex items-center justify-between mb-6">
                     <h2 className="text-xl font-bold text-white flex items-center gap-2">
                         <Calendar size={24} className="text-blue-400" />
-                        Due This Week
+                        Next Up This Week
                     </h2>
                     <span className="text-sm text-gray-500">{weekTasks.length} tasks</span>
                 </div>
