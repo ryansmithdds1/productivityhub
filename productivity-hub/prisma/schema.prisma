@@ -168,3 +168,30 @@ model WeeklyPlan {
 
   @@map("weekly_plans")
 }
+
+model Habit {
+  id          String     @id @default(cuid())
+  name        String
+  description String?
+  color       String     @default("green") // green, blue, red, orange, purple
+  icon        String?    // Lucide icon name
+  createdAt   BigInt
+  updatedAt   BigInt
+
+  logs        HabitLog[]
+
+  @@map("habits")
+}
+
+model HabitLog {
+  id        String   @id @default(cuid())
+  habitId   String
+  date      String   // Format: YYYY-MM-DD
+  completed Boolean  @default(true)
+  count     Int?     // Optional numeric value (e.g. pages read)
+  
+  habit     Habit    @relation(fields: [habitId], references: [id], onDelete: Cascade)
+
+  @@unique([habitId, date])
+  @@map("habit_logs")
+}
