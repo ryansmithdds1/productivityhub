@@ -138,7 +138,7 @@ export function DayPlanner({ date, tasks, onTaskUpdate, onEditTask }: DayPlanner
     };
 
     return (
-        <div className="grid grid-cols-[250px_1fr] gap-6 h-[calc(100vh-200px)]">
+        <div className="grid grid-cols-[350px_1fr] gap-6 h-[calc(100vh-200px)]">
             {/* Unscheduled Tasks Sidebar */}
             <div className="bg-gray-900 border border-gray-800 rounded-xl flex flex-col overflow-hidden">
                 <div className="p-4 border-b border-gray-800 flex items-center justify-between bg-gray-900 z-10">
