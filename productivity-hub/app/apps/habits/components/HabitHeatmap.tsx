@@ -138,8 +138,32 @@ export function HabitHeatmap({ habit, onToggle, onEdit, onDelete }: HabitHeatmap
                 </div>
             </div>
 
+            {/* Month labels */}
             <div className="overflow-x-auto pb-2">
+                <div className="flex gap-1 min-w-max mb-2 ml-8">
+                    {Array.from({ length: 12 }).map((_, monthIndex) => {
+                        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                        return (
+                            <div key={monthIndex} className="text-xs text-gray-500" style={{ width: '44px' }}>
+                                {monthNames[monthIndex]}
+                            </div>
+                        );
+                    })}
+                </div>
+
+                {/* Heatmap Grid */}
                 <div className="flex gap-1 min-w-max">
+                    {/* Day labels */}
+                    <div className="flex flex-col gap-1 mr-1">
+                        <div className="h-3 text-xs text-gray-500">Sun</div>
+                        <div className="h-3"></div>
+                        <div className="h-3 text-xs text-gray-500">Tue</div>
+                        <div className="h-3"></div>
+                        <div className="h-3 text-xs text-gray-500">Thu</div>
+                        <div className="h-3"></div>
+                        <div className="h-3 text-xs text-gray-500">Sat</div>
+                    </div>
+
                     {/* Weeks */}
                     {Array.from({ length: 53 }).map((_, weekIndex) => (
                         <div key={weekIndex} className="flex flex-col gap-1">
@@ -151,14 +175,30 @@ export function HabitHeatmap({ habit, onToggle, onEdit, onDelete }: HabitHeatmap
                                 const date = days[dayIndexTotal];
                                 const dateStr = date.toISOString().split('T')[0];
                                 const isCompleted = logsMap.has(dateStr);
+                                const formattedDate = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
                                 return (
                                     <div
                                         key={dateStr}
                                         onClick={() => onToggle(dateStr, !isCompleted)}
-                                        className={`w-3 h-3 rounded-sm cursor-pointer transition-colors ${getColorClass(isCompleted)}`}
-                                        title={`${dateStr}: ${isCompleted ? 'Completed' : 'Missed'}`}
-                                    />
+                                        onMouseEnter={() => setHoveredDate({ date: formattedDate, count: isCompleted ? 1 : 0 })}
+                                        onMouseLeave={() => setHoveredDate(null)}
+                                        className={`w-3 h-3 rounded-sm cursor-pointer transition-all relative group ${isCompleted
+                                                ? getColorClass(true) + ' border-2 border-white/20'
+                                                : 'bg-gray-800/50 hover:bg-gray-700/50 border border-gray-700'
+                                            }`}
+                                        title={`${formattedDate}: ${isCompleted ? '✓ Completed' : 'Not done'}`}
+                                    >
+                                        {/* Tooltip on hover */}
+                                        {hoveredDate?.date === formattedDate && (
+                                            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-950 border border-gray-700 rounded text-xs text-white whitespace-nowrap z-50 pointer-events-none">
+                                                {formattedDate}
+                                                <div className={`text-[10px] ${isCompleted ? 'text-green-400' : 'text-gray-400'}`}>
+                                                    {isCompleted ? '✓ Completed' : 'Not completed'}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
                                 );
                             })}
                         </div>
@@ -167,16 +207,19 @@ export function HabitHeatmap({ habit, onToggle, onEdit, onDelete }: HabitHeatmap
             </div>
 
             <div className="flex items-center justify-between mt-4 text-xs text-gray-500">
-                <div>Learn how we count contributions</div>
                 <div className="flex items-center gap-2">
-                    <span>Less</span>
+                    <span className="text-gray-400">Click any square to toggle completion</span>
+                </div>
+                <div className="flex items-center gap-2">
+                    <span>Not Done</span>
                     <div className="flex gap-1">
-                        <div className="w-3 h-3 rounded-sm bg-gray-800/50" />
-                        <div className={`w-3 h-3 rounded-sm ${getColorClass(true).split(' ')[0]} opacity-40`} />
-                        <div className={`w-3 h-3 rounded-sm ${getColorClass(true).split(' ')[0]} opacity-70`} />
-                        <div className={`w-3 h-3 rounded-sm ${getColorClass(true).split(' ')[0]}`} />
+                        <div className="w-3 h-3 rounded-sm bg-gray-800/50 border border-gray-700" />
                     </div>
-                    <span>More</span>
+                    <span className="mx-2">→</span>
+                    <span>Completed</span>
+                    <div className="flex gap-1">
+                        <div className={`w-3 h-3 rounded-sm ${getColorClass(true).split(' ')[0]} border-2 border-white/20`} />
+                    </div>
                 </div>
             </div>
         </div>
