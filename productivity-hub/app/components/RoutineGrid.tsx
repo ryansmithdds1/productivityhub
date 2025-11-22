@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Edit2, Save, X } from 'lucide-react';
+import { Edit2, Save, X, Scale, Footprints, Flame, Heart, Activity, Timer } from 'lucide-react';
 
 const DEFAULT_ROUTINES = {
     morning: `Morning Routine
@@ -322,6 +322,27 @@ function RoutineColumn({
                         {content}
                     </div>
                 )}
+            </div>
+        </div>
+    );
+}
+
+function MetricInput({ icon: Icon, label, value, unit, onChange }: { icon: any, label: string, value: string, unit?: string, onChange: (val: string) => void }) {
+    return (
+        <div className="bg-gray-800/50 rounded-lg p-3 border border-gray-700/50">
+            <div className="flex items-center gap-2 mb-2 text-gray-400">
+                <Icon size={14} />
+                <span className="text-xs font-medium uppercase tracking-wider">{label}</span>
+            </div>
+            <div className="flex items-baseline gap-1">
+                <input
+                    type="text"
+                    value={value}
+                    onChange={(e) => onChange(e.target.value)}
+                    className="w-full bg-transparent text-white font-mono font-medium focus:outline-none placeholder-gray-600"
+                    placeholder="-"
+                />
+                {unit && <span className="text-xs text-gray-500">{unit}</span>}
             </div>
         </div>
     );
