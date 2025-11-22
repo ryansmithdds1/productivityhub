@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Edit2, Save, X, Scale, Footprints, Flame, Heart, Activity, Timer } from 'lucide-react';
+import { Edit2, Save, X, Scale, Footprints, Flame, Heart, Activity, Timer, ChevronLeft, ChevronRight, LineChart } from 'lucide-react';
+import { HealthTrends } from './HealthTrends';
 
 const DEFAULT_ROUTINES = {
     morning: `Morning Routine
@@ -86,17 +87,111 @@ export function RoutineGrid() {
     const [metrics, setMetrics] = useState<HealthMetrics>(DEFAULT_METRICS);
     const [editing, setEditing] = useState<string | null>(null);
     const [isEditingMetrics, setIsEditingMetrics] = useState(false);
+    const [tempValue, setTempValue] = useState('');
 
-    // ... (existing useEffects)
+    // Date Navigation State
+    const [selectedDate, setSelectedDate] = useState(new Date());
+    const [showTrends, setShowTrends] = useState(false);
 
-    const handleSaveMetrics = async () => {
+    // Load from local storage on mount
+    useEffect(() => {
+        // Load Routines from Local Storage
+        const savedRoutines = localStorage.getItem('productivity_hub_routines');
+        if (savedRoutines) {
+            try {
+                const parsed = JSON.parse(savedRoutines);
+                setRoutines({ ...DEFAULT_ROUTINES, ...parsed });
+            } catch (e) {
+                console.error('Failed to parse saved routines', e);
+            }
+        }
+    }, []);
+
+    // Load Metrics when date changes
+    useEffect(() => {
+        const fetchMetrics = async () => {
+            try {
+                const dateStr = selectedDate.toISOString().split('T')[0];
+                const res = await fetch(`/api/health-metrics?date=${dateStr}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data && !data.error && Object.keys(data).length > 0) {
+                        setMetrics({ ...DEFAULT_METRICS, ...data });
+                    } else {
+                        setMetrics(DEFAULT_METRICS);
+                    }
+                }
+            } catch (e) {
+                console.error('Failed to fetch metrics', e);
+                setMetrics(DEFAULT_METRICS);
+            }
+        };
+        fetchMetrics();
+    }, [selectedDate]);
+
+    const handleDateChange = (days: number) => {
+        const newDate = new Date(selectedDate);
+        newDate.setDate(selectedDate.getDate() + days);
+        setSelectedDate(newDate);
+        setIsEditingMetrics(false); // Exit edit mode when changing dates
+    };
+
+    const formatDate = (date: Date) => {
+        const today = new Date();
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+
+        if (date.toDateString() === today.toDateString()) return 'Today';
+        if (date.toDateString() === yesterday.toDateString()) return 'Yesterday';
+        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    };
+
+    const handleEdit = (key: string) => {
+        setEditing(key);
+        // @ts-ignore
+        setTempValue(routines[key as keyof typeof routines]);
+    };
+
+    const handleSave = (key: string) => {
+        const newRoutines = { ...routines, [key]: tempValue };
+        setRoutines(newRoutines);
+        localStorage.setItem('productivity_hub_routines', JSON.stringify(newRoutines));
+        setEditing(null);
+    };
+
+    const handleCancel = () => {
+        setEditing(null);
+        setTempValue('');
+    };
+
+    const handleMetricChange = async (key: keyof HealthMetrics, value: string) => {
+        const newMetrics = { ...metrics, [key]: value };
+        setMetrics(newMetrics);
+
+        // Save to API
         try {
-            const date = new Date().toISOString().split('T')[0];
+            const dateStr = selectedDate.toISOString().split('T')[0];
             await fetch('/api/health-metrics', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    date,
+                    date: dateStr,
+                    ...newMetrics
+                })
+            });
+        } catch (e) {
+            console.error('Failed to save metrics', e);
+        }
+    };
+
+    const handleSaveMetrics = async () => {
+        try {
+            const dateStr = selectedDate.toISOString().split('T')[0];
+            await fetch('/api/health-metrics', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    date: dateStr,
                     ...metrics
                 })
             });
@@ -177,8 +272,39 @@ export function RoutineGrid() {
                 {/* Health Metrics (Takes up 1/3 on large screens) */}
                 <div className="rounded-xl border border-red-500/20 bg-red-500/5 overflow-hidden flex flex-col h-full">
                     <div className="p-4 border-b border-gray-800/50 bg-gray-900/50 flex items-center justify-between">
-                        <h3 className="font-semibold text-red-400">Health Metrics</h3>
+                        <div className="flex items-center gap-4">
+                            <h3 className="font-semibold text-red-400">Health Metrics</h3>
+
+                            {/* Date Navigation */}
+                            <div className="flex items-center gap-2 bg-gray-800/50 rounded-lg p-1">
+                                <button
+                                    onClick={() => handleDateChange(-1)}
+                                    className="p-1 hover:bg-gray-700 rounded text-gray-400 hover:text-white transition-colors"
+                                >
+                                    <ChevronLeft size={14} />
+                                </button>
+                                <span className="text-xs font-mono font-medium text-gray-300 min-w-[80px] text-center">
+                                    {formatDate(selectedDate)}
+                                </span>
+                                <button
+                                    onClick={() => handleDateChange(1)}
+                                    className="p-1 hover:bg-gray-700 rounded text-gray-400 hover:text-white transition-colors"
+                                    disabled={formatDate(selectedDate) === 'Today'}
+                                >
+                                    <ChevronRight size={14} className={formatDate(selectedDate) === 'Today' ? 'opacity-30' : ''} />
+                                </button>
+                            </div>
+                        </div>
+
                         <div className="flex items-center gap-2">
+                            <button
+                                onClick={() => setShowTrends(true)}
+                                className="p-1.5 hover:bg-gray-700 rounded-lg text-blue-400 transition-colors mr-2"
+                                title="View Trends"
+                            >
+                                <LineChart size={16} />
+                            </button>
+
                             {isEditingMetrics ? (
                                 <>
                                     <button
@@ -259,11 +385,88 @@ export function RoutineGrid() {
                     </div>
                 </div>
             </div>
+
+            {/* Trends Modal */}
+            {showTrends && <HealthTrends onClose={() => setShowTrends(false)} />}
         </div>
     );
 }
 
-// ... (RoutineColumnProps and RoutineColumn remain the same)
+interface RoutineColumnProps {
+    title: string;
+    content: string;
+    isEditing: boolean;
+    tempValue: string;
+    onEdit: () => void;
+    onSave: () => void;
+    onCancel: () => void;
+    onChange: (val: string) => void;
+    colorClass: string;
+    headerColor: string;
+}
+
+function RoutineColumn({
+    title,
+    content,
+    isEditing,
+    tempValue,
+    onEdit,
+    onSave,
+    onCancel,
+    onChange,
+    colorClass,
+    headerColor
+}: RoutineColumnProps) {
+    return (
+        <div className={`rounded-xl border ${colorClass} overflow-hidden flex flex-col h-full`}>
+            <div className="p-4 border-b border-gray-800/50 flex items-center justify-between bg-gray-900/50">
+                <h3 className={`font-semibold ${headerColor}`}>{title}</h3>
+                <div className="flex items-center gap-2">
+                    {isEditing ? (
+                        <>
+                            <button
+                                onClick={onSave}
+                                className="p-1.5 hover:bg-gray-700 rounded-lg text-green-400 transition-colors"
+                                title="Save"
+                            >
+                                <Save size={16} />
+                            </button>
+                            <button
+                                onClick={onCancel}
+                                className="p-1.5 hover:bg-gray-700 rounded-lg text-red-400 transition-colors"
+                                title="Cancel"
+                            >
+                                <X size={16} />
+                            </button>
+                        </>
+                    ) : (
+                        <button
+                            onClick={onEdit}
+                            className="p-1.5 hover:bg-gray-700 rounded-lg text-gray-400 hover:text-white transition-colors"
+                            title="Edit"
+                        >
+                            <Edit2 size={16} />
+                        </button>
+                    )}
+                </div>
+            </div>
+
+            <div className="p-4 flex-1">
+                {isEditing ? (
+                    <textarea
+                        value={tempValue}
+                        onChange={(e) => onChange(e.target.value)}
+                        className="w-full h-[400px] bg-gray-800/50 border border-gray-700 rounded-lg p-3 text-sm text-gray-200 focus:outline-none focus:border-blue-500/50 resize-none font-mono"
+                    />
+                ) : (
+                    <div className="prose prose-invert prose-sm max-w-none whitespace-pre-wrap text-gray-300 text-sm font-mono leading-relaxed">
+                        {content}
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+}
 
 function MetricInput({ icon: Icon, label, value, unit, isEditing, onChange }: { icon: any, label: string, value: string, unit?: string, isEditing: boolean, onChange: (val: string) => void }) {
     return (

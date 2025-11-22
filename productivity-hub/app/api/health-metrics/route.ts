@@ -10,16 +10,32 @@ export async function GET(request: Request) {
     }
 
     const { searchParams } = new URL(request.url);
-    const date = searchParams.get('date') || new Date().toISOString().split('T')[0];
+    const date = searchParams.get('date');
+    const days = searchParams.get('days');
 
     try {
-        const metric = await prisma.healthMetric.findUnique({
-            where: {
-                date: date,
-            },
-        });
+        if (days) {
+            // Fetch range of data
+            const limit = parseInt(days);
+            const metrics = await prisma.healthMetric.findMany({
+                take: limit,
+                orderBy: {
+                    date: 'desc',
+                },
+            });
 
-        return NextResponse.json(metric || {});
+            // Reverse to show oldest to newest for charts
+            return NextResponse.json(metrics.reverse());
+        } else {
+            // Fetch single date
+            const targetDate = date || new Date().toISOString().split('T')[0];
+            const metric = await prisma.healthMetric.findUnique({
+                where: {
+                    date: targetDate,
+                },
+            });
+            return NextResponse.json(metric || {});
+        }
     } catch (error) {
         console.error('Error fetching health metrics:', error);
         return NextResponse.json({ error: 'Failed to fetch metrics' }, { status: 500 });
