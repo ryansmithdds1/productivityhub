@@ -1,9 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { Calendar, Home, Sprout, Tractor, Plus } from 'lucide-react';
+import { Calendar, Home, Sprout, Tractor, Plus, Library } from 'lucide-react';
 import type { Task, Category } from '../types';
 import { getCategoryColor, getNextRecurrence, getLastCompletedText } from '../lib/utils';
+import { MaintenanceTemplates, type MaintenanceTemplate } from './MaintenanceTemplates';
 
 interface MaintenancePlannerProps {
     tasks: Task[];
@@ -14,6 +15,28 @@ type MaintenanceCategory = 'all' | 'home' | 'property' | 'farm';
 
 export function MaintenancePlanner({ tasks, onEditTask }: MaintenancePlannerProps) {
     const [selectedCategory, setSelectedCategory] = useState<MaintenanceCategory>('all');
+    const [showTemplates, setShowTemplates] = useState(false);
+
+    const handleSelectTemplate = (template: MaintenanceTemplate) => {
+        // Create a partial task from the template
+        const partialTask = {
+            title: template.title,
+            description: template.description,
+            category: template.category,
+            recurring: {
+                frequency: template.frequency,
+                interval: template.interval || 1,
+                seasonalMonths: template.seasonalMonths,
+                specificMonth: template.specificMonth
+            }
+        };
+
+        // Close templates modal
+        setShowTemplates(false);
+
+        // Open task modal with template data (cast as any to bypass strict Task type for new task)
+        onEditTask(partialTask as any);
+    };
 
     // Filter for maintenance tasks (recurring tasks with maintenance patterns or categories)
     const maintenanceTasks = tasks.filter(task => {
@@ -123,14 +146,23 @@ export function MaintenancePlanner({ tasks, onEditTask }: MaintenancePlannerProp
                         <p className="text-sm text-gray-400">Manage your home, property, and farm maintenance</p>
                     </div>
                 </div>
-                <button
-                    onClick={() => onEditTask(undefined as any)}
-                    className="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-colors flex items-center gap-2"
-                >
-                    <Plus size={18} />
-                    <span className="hidden md:inline">New Task</span>
-                    <span className="md:hidden">New</span>
-                </button>
+                <div className="flex gap-2">
+                    <button
+                        onClick={() => setShowTemplates(true)}
+                        className="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg transition-colors flex items-center gap-2"
+                    >
+                        <Library size={18} />
+                        <span className="hidden md:inline">Templates</span>
+                    </button>
+                    <button
+                        onClick={() => onEditTask(undefined as any)}
+                        className="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-colors flex items-center gap-2"
+                    >
+                        <Plus size={18} />
+                        <span className="hidden md:inline">New Task</span>
+                        <span className="md:hidden">New</span>
+                    </button>
+                </div>
             </div>
 
             {/* Category Tabs */}
@@ -243,8 +275,21 @@ export function MaintenancePlanner({ tasks, onEditTask }: MaintenancePlannerProp
                     <p className="text-gray-400 mb-4">
                         Create recurring tasks with Quarterly, Bi-annual, Seasonal, or Annual frequencies to manage your home and property maintenance.
                     </p>
+                    <button
+                        onClick={() => setShowTemplates(true)}
+                        className="text-orange-400 hover:text-orange-300 font-medium flex items-center gap-2 mx-auto"
+                    >
+                        <Library size={16} />
+                        Browse Templates
+                    </button>
                 </div>
             )}
+
+            <MaintenanceTemplates
+                isOpen={showTemplates}
+                onClose={() => setShowTemplates(false)}
+                onSelectTemplate={handleSelectTemplate}
+            />
         </div>
     );
 }
