@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Calendar, Zap, Settings, User, LogOut, ListTodo, Users, ExternalLink, Dumbbell, Apple, Heart, Search, Folder } from 'lucide-react';
+import { LayoutDashboard, Calendar, Zap, Settings, User, LogOut, ListTodo, Users, ExternalLink, Dumbbell, Apple, Heart, Search, Folder, Instagram, TrendingUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface NavItem {
@@ -125,6 +125,26 @@ export function Sidebar() {
                         >
                             <Search size={20} className="group-hover:text-yellow-400 transition-colors" />
                             <span className="flex-1 text-sm font-medium">Inquiry</span>
+                            <ExternalLink size={14} className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                        </a>
+                        <a
+                            href="https://assistant.ascendviral.com/dashboard/ryansmithdds"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition-all group"
+                        >
+                            <Instagram size={20} className="group-hover:text-pink-500 transition-colors" />
+                            <span className="flex-1 text-sm font-medium">Instagram Growth</span>
+                            <ExternalLink size={14} className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                        </a>
+                        <a
+                            href="https://app.highsocial.com/dashboard/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition-all group"
+                        >
+                            <TrendingUp size={20} className="group-hover:text-cyan-400 transition-colors" />
+                            <span className="flex-1 text-sm font-medium">TikTok Growth</span>
                             <ExternalLink size={14} className="opacity-0 group-hover:opacity-100 transition-opacity" />
                         </a>
                     </div>
