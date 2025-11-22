@@ -77,8 +77,8 @@ export function TodoDashboardWidget() {
                                     <div
                                         key={task.id}
                                         className={`border rounded-lg p-3 transition-all cursor-pointer ${isOverdue
-                                                ? 'bg-red-500/10 border-red-500/50 hover:border-red-400'
-                                                : `${getCategoryColor(task.category)} hover:border-gray-600`
+                                            ? 'bg-red-500/10 border-red-500/50 hover:border-red-400'
+                                            : `${getCategoryColor(task.category)} hover:border-gray-600`
                                             } ${task.completed ? 'opacity-50' : ''}`}
                                         onClick={() => handleEditTask(task)}
                                     >
@@ -100,7 +100,7 @@ export function TodoDashboardWidget() {
                                             <div className="flex-1 min-w-0">
                                                 <div className="flex items-start justify-between gap-2">
                                                     <p className={`font-medium text-sm ${task.completed ? 'line-through text-gray-500' :
-                                                            isOverdue ? 'text-red-200' : 'text-white'
+                                                        isOverdue ? 'text-red-200' : 'text-white'
                                                         }`}>
                                                         {task.title}
                                                     </p>
@@ -153,7 +153,15 @@ export function TodoDashboardWidget() {
                                     className="flex items-center gap-3 p-3 border border-gray-800 rounded-lg hover:border-gray-700 transition-colors cursor-pointer"
                                     onClick={() => handleEditTask(task)}
                                 >
-                                    <Circle size={16} className="text-gray-600" />
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleToggleComplete(task);
+                                        }}
+                                        className="hover:scale-110 transition-transform"
+                                    >
+                                        <Circle size={16} className="text-gray-600 hover:text-green-400" />
+                                    </button>
                                     <div className="flex-1 min-w-0">
                                         <p className="text-gray-300 text-sm font-medium truncate">{task.title}</p>
                                         <p className="text-xs text-gray-500 mt-0.5">
