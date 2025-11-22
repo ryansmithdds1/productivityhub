@@ -62,21 +62,51 @@ Shakes:
 Whey isolate – 2 servings (80g protein)`
 };
 
+interface HealthMetrics {
+    weight: string;
+    steps: string;
+    calories: string;
+    rhr: string;
+    hrv: string;
+    exercise: string;
+}
+
+const DEFAULT_METRICS: HealthMetrics = {
+    weight: '',
+    steps: '',
+    calories: '',
+    rhr: '',
+    hrv: '',
+    exercise: ''
+};
+
 export function RoutineGrid() {
     const [routines, setRoutines] = useState(DEFAULT_ROUTINES);
+    const [metrics, setMetrics] = useState<HealthMetrics>(DEFAULT_METRICS);
     const [editing, setEditing] = useState<string | null>(null);
     const [tempValue, setTempValue] = useState('');
 
     // Load from local storage on mount
     useEffect(() => {
-        const saved = localStorage.getItem('productivity_hub_routines');
-        if (saved) {
+        // Load Routines
+        const savedRoutines = localStorage.getItem('productivity_hub_routines');
+        if (savedRoutines) {
             try {
-                const parsed = JSON.parse(saved);
+                const parsed = JSON.parse(savedRoutines);
                 // Merge with defaults to ensure new keys (like mealPlan) are present
                 setRoutines({ ...DEFAULT_ROUTINES, ...parsed });
             } catch (e) {
                 console.error('Failed to parse saved routines', e);
+            }
+        }
+
+        // Load Metrics
+        const savedMetrics = localStorage.getItem('productivity_hub_health_metrics');
+        if (savedMetrics) {
+            try {
+                setMetrics({ ...DEFAULT_METRICS, ...JSON.parse(savedMetrics) });
+            } catch (e) {
+                console.error('Failed to parse saved metrics', e);
             }
         }
     }, []);
@@ -99,8 +129,15 @@ export function RoutineGrid() {
         setTempValue('');
     };
 
+    const handleMetricChange = (key: keyof HealthMetrics, value: string) => {
+        const newMetrics = { ...metrics, [key]: value };
+        setMetrics(newMetrics);
+        localStorage.setItem('productivity_hub_health_metrics', JSON.stringify(newMetrics));
+    };
+
     return (
         <div className="space-y-6">
+            {/* Daily Routines Grid */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <RoutineColumn
                     title="Morning Routine"
@@ -140,21 +177,75 @@ export function RoutineGrid() {
                 />
             </div>
 
-            {/* Meal Plan Section */}
-            <div className="grid grid-cols-1">
-                <RoutineColumn
-                    title="Current Meal Plan"
-                    // @ts-ignore
-                    content={routines.mealPlan}
-                    isEditing={editing === 'mealPlan'}
-                    tempValue={tempValue}
-                    onEdit={() => handleEdit('mealPlan')}
-                    onSave={() => handleSave('mealPlan')}
-                    onCancel={handleCancel}
-                    onChange={setTempValue}
-                    colorClass="border-green-500/20 bg-green-500/5"
-                    headerColor="text-green-400"
-                />
+            {/* Bottom Section: Meal Plan & Health Metrics */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Meal Plan (Takes up 2/3 on large screens) */}
+                <div className="lg:col-span-2">
+                    <RoutineColumn
+                        title="Current Meal Plan"
+                        // @ts-ignore
+                        content={routines.mealPlan}
+                        isEditing={editing === 'mealPlan'}
+                        tempValue={tempValue}
+                        onEdit={() => handleEdit('mealPlan')}
+                        onSave={() => handleSave('mealPlan')}
+                        onCancel={handleCancel}
+                        onChange={setTempValue}
+                        colorClass="border-green-500/20 bg-green-500/5"
+                        headerColor="text-green-400"
+                    />
+                </div>
+
+                {/* Health Metrics (Takes up 1/3 on large screens) */}
+                <div className="rounded-xl border border-red-500/20 bg-red-500/5 overflow-hidden flex flex-col h-full">
+                    <div className="p-4 border-b border-gray-800/50 bg-gray-900/50">
+                        <h3 className="font-semibold text-red-400">Health Metrics</h3>
+                    </div>
+                    <div className="p-6 flex-1">
+                        <div className="grid grid-cols-2 gap-4">
+                            <MetricInput
+                                icon={Scale}
+                                label="Weight"
+                                value={metrics.weight}
+                                unit="lbs"
+                                onChange={(v) => handleMetricChange('weight', v)}
+                            />
+                            <MetricInput
+                                icon={Footprints}
+                                label="Steps"
+                                value={metrics.steps}
+                                onChange={(v) => handleMetricChange('steps', v)}
+                            />
+                            <MetricInput
+                                icon={Flame}
+                                label="Calories"
+                                value={metrics.calories}
+                                onChange={(v) => handleMetricChange('calories', v)}
+                            />
+                            <MetricInput
+                                icon={Heart}
+                                label="RHR"
+                                value={metrics.rhr}
+                                unit="bpm"
+                                onChange={(v) => handleMetricChange('rhr', v)}
+                            />
+                            <MetricInput
+                                icon={Activity}
+                                label="HRV"
+                                value={metrics.hrv}
+                                unit="ms"
+                                onChange={(v) => handleMetricChange('hrv', v)}
+                            />
+                            <MetricInput
+                                icon={Timer}
+                                label="Exercise"
+                                value={metrics.exercise}
+                                unit="min"
+                                onChange={(v) => handleMetricChange('exercise', v)}
+                            />
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     );
