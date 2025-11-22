@@ -81,6 +81,7 @@ const DEFAULT_METRICS: HealthMetrics = {
 };
 
 export function RoutineGrid() {
+    console.log('Rendering RoutineGrid');
     const [routines, setRoutines] = useState(DEFAULT_ROUTINES);
     const [metrics, setMetrics] = useState<HealthMetrics>(DEFAULT_METRICS);
     const [editing, setEditing] = useState<string | null>(null);
