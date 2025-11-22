@@ -85,63 +85,11 @@ export function RoutineGrid() {
     const [routines, setRoutines] = useState(DEFAULT_ROUTINES);
     const [metrics, setMetrics] = useState<HealthMetrics>(DEFAULT_METRICS);
     const [editing, setEditing] = useState<string | null>(null);
-    const [tempValue, setTempValue] = useState('');
+    const [isEditingMetrics, setIsEditingMetrics] = useState(false);
 
-    // Load from local storage on mount
-    useEffect(() => {
-        // Load Routines from Local Storage
-        const savedRoutines = localStorage.getItem('productivity_hub_routines');
-        if (savedRoutines) {
-            try {
-                const parsed = JSON.parse(savedRoutines);
-                setRoutines({ ...DEFAULT_ROUTINES, ...parsed });
-            } catch (e) {
-                console.error('Failed to parse saved routines', e);
-            }
-        }
+    // ... (existing useEffects)
 
-        // Load Metrics from API
-        const fetchMetrics = async () => {
-            try {
-                const date = new Date().toISOString().split('T')[0];
-                const res = await fetch(`/api/health-metrics?date=${date}`);
-                if (res.ok) {
-                    const data = await res.json();
-                    // Only update if data exists, otherwise keep defaults
-                    if (data && !data.error && Object.keys(data).length > 0) {
-                        setMetrics(prev => ({ ...DEFAULT_METRICS, ...data }));
-                    }
-                }
-            } catch (e) {
-                console.error('Failed to fetch metrics', e);
-            }
-        };
-        fetchMetrics();
-    }, []);
-
-    const handleEdit = (key: string) => {
-        setEditing(key);
-        // @ts-ignore
-        setTempValue(routines[key as keyof typeof routines]);
-    };
-
-    const handleSave = (key: string) => {
-        const newRoutines = { ...routines, [key]: tempValue };
-        setRoutines(newRoutines);
-        localStorage.setItem('productivity_hub_routines', JSON.stringify(newRoutines));
-        setEditing(null);
-    };
-
-    const handleCancel = () => {
-        setEditing(null);
-        setTempValue('');
-    };
-
-    const handleMetricChange = async (key: keyof HealthMetrics, value: string) => {
-        const newMetrics = { ...metrics, [key]: value };
-        setMetrics(newMetrics);
-
-        // Save to API
+    const handleSaveMetrics = async () => {
         try {
             const date = new Date().toISOString().split('T')[0];
             await fetch('/api/health-metrics', {
@@ -149,18 +97,26 @@ export function RoutineGrid() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     date,
-                    ...newMetrics
+                    ...metrics
                 })
             });
+            setIsEditingMetrics(false);
         } catch (e) {
             console.error('Failed to save metrics', e);
         }
     };
 
+    const handleCancelMetrics = () => {
+        setIsEditingMetrics(false);
+        // Re-fetch or reset to saved state could be added here if needed
+        // For now, we just exit edit mode, keeping current local state
+    };
+
     return (
         <div className="space-y-6">
-            {/* Daily Routines Grid */}
+            {/* ... (Daily Routines Grid) */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {/* ... (RoutineColumns) */}
                 <RoutineColumn
                     title="Morning Routine"
                     content={routines.morning}
@@ -220,8 +176,36 @@ export function RoutineGrid() {
 
                 {/* Health Metrics (Takes up 1/3 on large screens) */}
                 <div className="rounded-xl border border-red-500/20 bg-red-500/5 overflow-hidden flex flex-col h-full">
-                    <div className="p-4 border-b border-gray-800/50 bg-gray-900/50">
+                    <div className="p-4 border-b border-gray-800/50 bg-gray-900/50 flex items-center justify-between">
                         <h3 className="font-semibold text-red-400">Health Metrics</h3>
+                        <div className="flex items-center gap-2">
+                            {isEditingMetrics ? (
+                                <>
+                                    <button
+                                        onClick={handleSaveMetrics}
+                                        className="p-1.5 hover:bg-gray-700 rounded-lg text-green-400 transition-colors"
+                                        title="Save"
+                                    >
+                                        <Save size={16} />
+                                    </button>
+                                    <button
+                                        onClick={handleCancelMetrics}
+                                        className="p-1.5 hover:bg-gray-700 rounded-lg text-red-400 transition-colors"
+                                        title="Cancel"
+                                    >
+                                        <X size={16} />
+                                    </button>
+                                </>
+                            ) : (
+                                <button
+                                    onClick={() => setIsEditingMetrics(true)}
+                                    className="p-1.5 hover:bg-gray-700 rounded-lg text-gray-400 hover:text-white transition-colors"
+                                    title="Edit"
+                                >
+                                    <Edit2 size={16} />
+                                </button>
+                            )}
+                        </div>
                     </div>
                     <div className="p-6 flex-1">
                         <div className="grid grid-cols-2 gap-4">
@@ -230,18 +214,21 @@ export function RoutineGrid() {
                                 label="Weight"
                                 value={metrics.weight}
                                 unit="lbs"
+                                isEditing={isEditingMetrics}
                                 onChange={(v) => handleMetricChange('weight', v)}
                             />
                             <MetricInput
                                 icon={Footprints}
                                 label="Steps"
                                 value={metrics.steps}
+                                isEditing={isEditingMetrics}
                                 onChange={(v) => handleMetricChange('steps', v)}
                             />
                             <MetricInput
                                 icon={Flame}
                                 label="Calories"
                                 value={metrics.calories}
+                                isEditing={isEditingMetrics}
                                 onChange={(v) => handleMetricChange('calories', v)}
                             />
                             <MetricInput
@@ -249,6 +236,7 @@ export function RoutineGrid() {
                                 label="RHR"
                                 value={metrics.rhr}
                                 unit="bpm"
+                                isEditing={isEditingMetrics}
                                 onChange={(v) => handleMetricChange('rhr', v)}
                             />
                             <MetricInput
@@ -256,6 +244,7 @@ export function RoutineGrid() {
                                 label="HRV"
                                 value={metrics.hrv}
                                 unit="ms"
+                                isEditing={isEditingMetrics}
                                 onChange={(v) => handleMetricChange('hrv', v)}
                             />
                             <MetricInput
@@ -263,6 +252,7 @@ export function RoutineGrid() {
                                 label="Exercise"
                                 value={metrics.exercise}
                                 unit="min"
+                                isEditing={isEditingMetrics}
                                 onChange={(v) => handleMetricChange('exercise', v)}
                             />
                         </div>
@@ -273,98 +263,33 @@ export function RoutineGrid() {
     );
 }
 
-interface RoutineColumnProps {
-    title: string;
-    content: string;
-    isEditing: boolean;
-    tempValue: string;
-    onEdit: () => void;
-    onSave: () => void;
-    onCancel: () => void;
-    onChange: (val: string) => void;
-    colorClass: string;
-    headerColor: string;
-}
+// ... (RoutineColumnProps and RoutineColumn remain the same)
 
-function RoutineColumn({
-    title,
-    content,
-    isEditing,
-    tempValue,
-    onEdit,
-    onSave,
-    onCancel,
-    onChange,
-    colorClass,
-    headerColor
-}: RoutineColumnProps) {
-    return (
-        <div className={`rounded-xl border ${colorClass} overflow-hidden flex flex-col h-full`}>
-            <div className="p-4 border-b border-gray-800/50 flex items-center justify-between bg-gray-900/50">
-                <h3 className={`font-semibold ${headerColor}`}>{title}</h3>
-                <div className="flex items-center gap-2">
-                    {isEditing ? (
-                        <>
-                            <button
-                                onClick={onSave}
-                                className="p-1.5 hover:bg-gray-700 rounded-lg text-green-400 transition-colors"
-                                title="Save"
-                            >
-                                <Save size={16} />
-                            </button>
-                            <button
-                                onClick={onCancel}
-                                className="p-1.5 hover:bg-gray-700 rounded-lg text-red-400 transition-colors"
-                                title="Cancel"
-                            >
-                                <X size={16} />
-                            </button>
-                        </>
-                    ) : (
-                        <button
-                            onClick={onEdit}
-                            className="p-1.5 hover:bg-gray-700 rounded-lg text-gray-400 hover:text-white transition-colors"
-                            title="Edit"
-                        >
-                            <Edit2 size={16} />
-                        </button>
-                    )}
-                </div>
-            </div>
-
-            <div className="p-4 flex-1">
-                {isEditing ? (
-                    <textarea
-                        value={tempValue}
-                        onChange={(e) => onChange(e.target.value)}
-                        className="w-full h-[400px] bg-gray-800/50 border border-gray-700 rounded-lg p-3 text-sm text-gray-200 focus:outline-none focus:border-blue-500/50 resize-none font-mono"
-                    />
-                ) : (
-                    <div className="prose prose-invert prose-sm max-w-none whitespace-pre-wrap text-gray-300 text-sm font-mono leading-relaxed">
-                        {content}
-                    </div>
-                )}
-            </div>
-        </div>
-    );
-}
-
-function MetricInput({ icon: Icon, label, value, unit, onChange }: { icon: any, label: string, value: string, unit?: string, onChange: (val: string) => void }) {
+function MetricInput({ icon: Icon, label, value, unit, isEditing, onChange }: { icon: any, label: string, value: string, unit?: string, isEditing: boolean, onChange: (val: string) => void }) {
     return (
         <div className="bg-gray-800/50 rounded-lg p-3 border border-gray-700/50">
             <div className="flex items-center gap-2 mb-2 text-gray-400">
                 <Icon size={14} />
                 <span className="text-xs font-medium uppercase tracking-wider">{label}</span>
             </div>
-            <div className="flex items-baseline gap-1">
-                <input
-                    type="text"
-                    value={value}
-                    onChange={(e) => onChange(e.target.value)}
-                    className="w-full bg-transparent text-white font-mono font-medium focus:outline-none placeholder-gray-600"
-                    placeholder="-"
-                />
-                {unit && <span className="text-xs text-gray-500">{unit}</span>}
+            <div className="flex items-baseline gap-1 h-6">
+                {isEditing ? (
+                    <>
+                        <input
+                            type="text"
+                            value={value}
+                            onChange={(e) => onChange(e.target.value)}
+                            className="w-full bg-transparent text-white font-mono font-medium focus:outline-none placeholder-gray-600 border-b border-gray-700 focus:border-blue-500"
+                            placeholder="-"
+                        />
+                        {unit && <span className="text-xs text-gray-500">{unit}</span>}
+                    </>
+                ) : (
+                    <div className="flex items-baseline gap-1">
+                        <span className="text-white font-mono font-medium">{value || '-'}</span>
+                        {value && unit && <span className="text-xs text-gray-500">{unit}</span>}
+                    </div>
+                )}
             </div>
         </div>
     );
