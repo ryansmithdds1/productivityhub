@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Calendar, Zap, Settings, User, LogOut, ListTodo, Users, ExternalLink, Dumbbell, Apple } from 'lucide-react';
+import { LayoutDashboard, Calendar, Zap, Settings, User, LogOut, ListTodo, Users, ExternalLink, Dumbbell, Apple, Heart, Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface NavItem {
@@ -104,6 +104,26 @@ export function Sidebar() {
                         >
                             <Users size={20} className="group-hover:text-blue-400 transition-colors" />
                             <span className="flex-1 text-sm font-medium">Editing Team</span>
+                            <ExternalLink size={14} className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                        </a>
+                        <a
+                            href="https://benefits.dmba.com/suite/sites/emed"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition-all group"
+                        >
+                            <Heart size={20} className="group-hover:text-pink-400 transition-colors" />
+                            <span className="flex-1 text-sm font-medium">Emed</span>
+                            <ExternalLink size={14} className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                        </a>
+                        <a
+                            href="https://inq.crm.dynamics.com/main.aspx?appid=5071990d-4de3-ec11-bb3d-0022482ea9aa&forceUCI=1&pagetype=entitylist&etn=inq_missionary&viewid=7b560690-3bed-47c8-9bb7-97e746b6d562&viewType=1039"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition-all group"
+                        >
+                            <Search size={20} className="group-hover:text-yellow-400 transition-colors" />
+                            <span className="flex-1 text-sm font-medium">Inquiry</span>
                             <ExternalLink size={14} className="opacity-0 group-hover:opacity-100 transition-opacity" />
                         </a>
                     </div>
