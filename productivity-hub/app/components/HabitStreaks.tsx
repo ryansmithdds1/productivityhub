@@ -76,31 +76,32 @@ export function HabitStreaks() {
     if (loading || habits.length === 0) return null;
 
     return (
-        <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
-            <div className="flex items-center justify-between mb-3">
-                <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                    <Flame size={16} className="text-orange-500" />
+        <div className="bg-gray-900 border border-gray-800 rounded-xl p-3">
+            <div className="flex items-center justify-between mb-2">
+                <h3 className="text-xs font-bold text-white flex items-center gap-1.5">
+                    <Flame size={14} className="text-orange-500" />
                     Habit Streaks
                 </h3>
                 <Link
                     href="/apps/habits"
-                    className="text-xs text-gray-500 hover:text-blue-400 transition-colors"
+                    className="text-[10px] text-gray-500 hover:text-blue-400 transition-colors"
                 >
                     View All →
                 </Link>
             </div>
 
-            <div className="space-y-2">
+            <div className="flex gap-3 overflow-x-auto pb-1 scrollbar-thin">
                 {habits.map(habit => {
                     const streak = calculateStreak(habit.logs);
                     return (
-                        <div key={habit.id} className="flex items-center justify-between py-1.5 px-2 rounded-lg hover:bg-gray-800/50 transition-colors">
-                            <div className="flex items-center gap-2 flex-1 min-w-0">
-                                <div className={`w-2 h-2 rounded-full ${getColorClass(habit.color).replace('text-', 'bg-')}`} />
-                                <span className="text-sm text-gray-300 truncate">{habit.name}</span>
-                            </div>
-                            <div className={`flex items-center gap-1 text-sm font-bold ${streak > 0 ? 'text-orange-400' : 'text-gray-600'}`}>
-                                {streak > 0 && <Flame size={14} className="animate-pulse" />}
+                        <div
+                            key={habit.id}
+                            className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-800/50 hover:bg-gray-800 transition-colors flex-shrink-0"
+                        >
+                            <div className={`w-1.5 h-1.5 rounded-full ${getColorClass(habit.color).replace('text-', 'bg-')}`} />
+                            <span className="text-xs text-gray-300 whitespace-nowrap">{habit.name}</span>
+                            <div className={`flex items-center gap-0.5 text-xs font-bold ${streak > 0 ? 'text-orange-400' : 'text-gray-600'} ml-1`}>
+                                {streak > 0 && <Flame size={12} className="animate-pulse" />}
                                 <span>{streak}</span>
                             </div>
                         </div>

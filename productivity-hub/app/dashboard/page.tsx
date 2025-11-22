@@ -28,14 +28,14 @@ export default async function DashboardPage() {
 
             {/* Main Content */}
             <div className="p-8 space-y-8">
+                {/* Habit Streaks */}
+                <HabitStreaks />
+
                 {/* Today's Tasks */}
                 <TodoDashboardWidget />
 
                 {/* Daily Routines */}
                 <RoutineGrid />
-
-                {/* Habit Streaks */}
-                <HabitStreaks />
 
                 {/* YouTube Stats */}
                 <YouTubeStats
