@@ -46,6 +46,11 @@ export function isTaskDueToday(task: Task): boolean {
     return task.dueDate === today && !task.completed;
 }
 
+export function isTaskOverdue(task: Task): boolean {
+    const today = getStartOfDay();
+    return task.dueDate < today && !task.completed;
+}
+
 export function isTaskDueThisWeek(task: Task): boolean {
     const today = getStartOfDay();
     const weekEnd = today + (7 * 24 * 60 * 60 * 1000);
