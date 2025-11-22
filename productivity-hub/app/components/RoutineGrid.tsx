@@ -40,7 +40,26 @@ In Office Visit Routine
 4. Record Calories & Food (5 min): Open your spreadsheet and log your food for the day. Be honest and quick.
 5. Plan Out Tomorrow In Full Detail (10 min):
 6. Pray / Relax / Mindfullness
-7. Read Church Book or Listen To Talk Falling Asleep`
+7. Read Church Book or Listen To Talk Falling Asleep`,
+
+    mealPlan: `Breakfast:
+4 whole eggs
+Peppers + onions
+1 oz fat-free cheese (optional)
+
+Lunch:
+12 oz chicken breast
+2 cups green beans
+Side salad (lettuce + vinegar)
+½ tbsp olive oil for cooking
+
+Dinner:
+4 whole eggs
+Peppers + onions
+1 oz fat-free cheese (optional)
+
+Shakes:
+Whey isolate – 2 servings (80g protein)`
 };
 
 export function RoutineGrid() {
@@ -53,7 +72,9 @@ export function RoutineGrid() {
         const saved = localStorage.getItem('productivity_hub_routines');
         if (saved) {
             try {
-                setRoutines(JSON.parse(saved));
+                const parsed = JSON.parse(saved);
+                // Merge with defaults to ensure new keys (like mealPlan) are present
+                setRoutines({ ...DEFAULT_ROUTINES, ...parsed });
             } catch (e) {
                 console.error('Failed to parse saved routines', e);
             }
@@ -62,6 +83,7 @@ export function RoutineGrid() {
 
     const handleEdit = (key: string) => {
         setEditing(key);
+        // @ts-ignore
         setTempValue(routines[key as keyof typeof routines]);
     };
 
@@ -78,43 +100,62 @@ export function RoutineGrid() {
     };
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <RoutineColumn
-                title="Morning Routine"
-                content={routines.morning}
-                isEditing={editing === 'morning'}
-                tempValue={tempValue}
-                onEdit={() => handleEdit('morning')}
-                onSave={() => handleSave('morning')}
-                onCancel={handleCancel}
-                onChange={setTempValue}
-                colorClass="border-orange-500/20 bg-orange-500/5"
-                headerColor="text-orange-400"
-            />
-            <RoutineColumn
-                title="During The Day"
-                content={routines.day}
-                isEditing={editing === 'day'}
-                tempValue={tempValue}
-                onEdit={() => handleEdit('day')}
-                onSave={() => handleSave('day')}
-                onCancel={handleCancel}
-                onChange={setTempValue}
-                colorClass="border-blue-500/20 bg-blue-500/5"
-                headerColor="text-blue-400"
-            />
-            <RoutineColumn
-                title="Night Routine"
-                content={routines.night}
-                isEditing={editing === 'night'}
-                tempValue={tempValue}
-                onEdit={() => handleEdit('night')}
-                onSave={() => handleSave('night')}
-                onCancel={handleCancel}
-                onChange={setTempValue}
-                colorClass="border-purple-500/20 bg-purple-500/5"
-                headerColor="text-purple-400"
-            />
+        <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <RoutineColumn
+                    title="Morning Routine"
+                    content={routines.morning}
+                    isEditing={editing === 'morning'}
+                    tempValue={tempValue}
+                    onEdit={() => handleEdit('morning')}
+                    onSave={() => handleSave('morning')}
+                    onCancel={handleCancel}
+                    onChange={setTempValue}
+                    colorClass="border-orange-500/20 bg-orange-500/5"
+                    headerColor="text-orange-400"
+                />
+                <RoutineColumn
+                    title="During The Day"
+                    content={routines.day}
+                    isEditing={editing === 'day'}
+                    tempValue={tempValue}
+                    onEdit={() => handleEdit('day')}
+                    onSave={() => handleSave('day')}
+                    onCancel={handleCancel}
+                    onChange={setTempValue}
+                    colorClass="border-blue-500/20 bg-blue-500/5"
+                    headerColor="text-blue-400"
+                />
+                <RoutineColumn
+                    title="Night Routine"
+                    content={routines.night}
+                    isEditing={editing === 'night'}
+                    tempValue={tempValue}
+                    onEdit={() => handleEdit('night')}
+                    onSave={() => handleSave('night')}
+                    onCancel={handleCancel}
+                    onChange={setTempValue}
+                    colorClass="border-purple-500/20 bg-purple-500/5"
+                    headerColor="text-purple-400"
+                />
+            </div>
+
+            {/* Meal Plan Section */}
+            <div className="grid grid-cols-1">
+                <RoutineColumn
+                    title="Current Meal Plan"
+                    // @ts-ignore
+                    content={routines.mealPlan}
+                    isEditing={editing === 'mealPlan'}
+                    tempValue={tempValue}
+                    onEdit={() => handleEdit('mealPlan')}
+                    onSave={() => handleSave('mealPlan')}
+                    onCancel={handleCancel}
+                    onChange={setTempValue}
+                    colorClass="border-green-500/20 bg-green-500/5"
+                    headerColor="text-green-400"
+                />
+            </div>
         </div>
     );
 }
