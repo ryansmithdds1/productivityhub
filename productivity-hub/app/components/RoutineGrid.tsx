@@ -60,7 +60,12 @@ Peppers + onions
 1 oz fat-free cheese (optional)
 
 Shakes:
-Whey isolate – 2 servings (80g protein)`
+Whey isolate – 2 servings (80g protein)`,
+
+    goals: `Current Goals:
+1. 
+2. 
+3. `
 };
 
 interface HealthMetrics {
@@ -250,10 +255,10 @@ export function RoutineGrid() {
                 />
             </div>
 
-            {/* Bottom Section: Meal Plan & Health Metrics */}
+            {/* Bottom Section: Meal Plan, Goals & Health Metrics */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Meal Plan (Takes up 2/3 on large screens) */}
-                <div className="lg:col-span-2">
+                {/* Meal Plan */}
+                <div className="h-full">
                     <RoutineColumn
                         title="Current Meal Plan"
                         // @ts-ignore
@@ -269,7 +274,24 @@ export function RoutineGrid() {
                     />
                 </div>
 
-                {/* Health Metrics (Takes up 1/3 on large screens) */}
+                {/* Goals */}
+                <div className="h-full">
+                    <RoutineColumn
+                        title="My Current Goals"
+                        // @ts-ignore
+                        content={routines.goals}
+                        isEditing={editing === 'goals'}
+                        tempValue={tempValue}
+                        onEdit={() => handleEdit('goals')}
+                        onSave={() => handleSave('goals')}
+                        onCancel={handleCancel}
+                        onChange={setTempValue}
+                        colorClass="border-yellow-500/20 bg-yellow-500/5"
+                        headerColor="text-yellow-400"
+                    />
+                </div>
+
+                {/* Health Metrics */}
                 <div className="rounded-xl border border-red-500/20 bg-red-500/5 overflow-hidden flex flex-col h-full">
                     <div className="p-4 border-b border-gray-800/50 bg-gray-900/50 flex items-center justify-between">
                         <div className="flex items-center gap-4">
