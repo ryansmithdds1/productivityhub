@@ -6,6 +6,7 @@ import { DashboardLayout } from '@/app/components/DashboardLayout';
 import { TodoDashboardWidget } from '@/app/components/TodoDashboardWidget';
 import { YouTubeStats } from '@/app/components/YouTubeStats';
 import { YouTubeLatestVideos } from '@/app/components/YouTubeLatestVideos';
+import { RoutineGrid } from '@/app/components/RoutineGrid';
 
 export default async function DashboardPage() {
     const session = await getServerSession(authOptions);
@@ -28,6 +29,9 @@ export default async function DashboardPage() {
             <div className="p-8 space-y-8">
                 {/* Today's Tasks */}
                 <TodoDashboardWidget />
+
+                {/* Daily Routines */}
+                <RoutineGrid />
 
                 {/* YouTube Stats */}
                 <YouTubeStats
