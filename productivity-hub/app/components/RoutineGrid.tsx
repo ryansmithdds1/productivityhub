@@ -88,27 +88,34 @@ export function RoutineGrid() {
 
     // Load from local storage on mount
     useEffect(() => {
-        // Load Routines
+        // Load Routines from Local Storage
         const savedRoutines = localStorage.getItem('productivity_hub_routines');
         if (savedRoutines) {
             try {
                 const parsed = JSON.parse(savedRoutines);
-                // Merge with defaults to ensure new keys (like mealPlan) are present
                 setRoutines({ ...DEFAULT_ROUTINES, ...parsed });
             } catch (e) {
                 console.error('Failed to parse saved routines', e);
             }
         }
 
-        // Load Metrics
-        const savedMetrics = localStorage.getItem('productivity_hub_health_metrics');
-        if (savedMetrics) {
+        // Load Metrics from API
+        const fetchMetrics = async () => {
             try {
-                setMetrics({ ...DEFAULT_METRICS, ...JSON.parse(savedMetrics) });
+                const date = new Date().toISOString().split('T')[0];
+                const res = await fetch(`/api/health-metrics?date=${date}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    // Only update if data exists, otherwise keep defaults
+                    if (data && !data.error && Object.keys(data).length > 0) {
+                        setMetrics(prev => ({ ...DEFAULT_METRICS, ...data }));
+                    }
+                }
             } catch (e) {
-                console.error('Failed to parse saved metrics', e);
+                console.error('Failed to fetch metrics', e);
             }
-        }
+        };
+        fetchMetrics();
     }, []);
 
     const handleEdit = (key: string) => {
@@ -129,10 +136,24 @@ export function RoutineGrid() {
         setTempValue('');
     };
 
-    const handleMetricChange = (key: keyof HealthMetrics, value: string) => {
+    const handleMetricChange = async (key: keyof HealthMetrics, value: string) => {
         const newMetrics = { ...metrics, [key]: value };
         setMetrics(newMetrics);
-        localStorage.setItem('productivity_hub_health_metrics', JSON.stringify(newMetrics));
+
+        // Save to API
+        try {
+            const date = new Date().toISOString().split('T')[0];
+            await fetch('/api/health-metrics', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    date,
+                    ...newMetrics
+                })
+            });
+        } catch (e) {
+            console.error('Failed to save metrics', e);
+        }
     };
 
     return (

@@ -98,6 +98,22 @@ model Exercise {
   @@map("exercises")
 }
 
+model HealthMetric {
+  id        String   @id @default(cuid())
+  date      String   // Format: YYYY-MM-DD
+  weight    String?
+  steps     String?
+  calories  String?
+  rhr       String?
+  hrv       String?
+  exercise  String?
+  createdAt BigInt
+  updatedAt BigInt
+
+  @@unique([date])
+  @@map("health_metrics")
+}
+
 model Workout {
   id        String   @id @default(cuid())
   name      String   // e.g. "Push A"
