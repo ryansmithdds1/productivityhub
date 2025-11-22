@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Edit2, Save, X, Scale, Footprints, Flame, Heart, Activity, Timer, ChevronLeft, ChevronRight, LineChart } from 'lucide-react';
+import { Edit2, Save, X, Scale, Footprints, Flame, Heart, Activity, Timer, ChevronLeft, ChevronRight, LineChart, CheckCircle2 } from 'lucide-react';
 import { HealthTrends } from './HealthTrends';
 
 const DEFAULT_ROUTINES = {
@@ -117,6 +117,8 @@ export function RoutineGrid() {
         const fetchMetrics = async () => {
             try {
                 const dateStr = selectedDate.toISOString().split('T')[0];
+
+                // Fetch current date metrics
                 const res = await fetch(`/api/health-metrics?date=${dateStr}`);
                 if (res.ok) {
                     const data = await res.json();
@@ -126,6 +128,13 @@ export function RoutineGrid() {
                         setMetrics(DEFAULT_METRICS);
                     }
                 }
+
+                // Fetch 7-day history for averages
+                const historyRes = await fetch('/api/health-metrics?days=7');
+                if (historyRes.ok) {
+                    const history = await historyRes.json();
+                    calculateAverages(history);
+                }
             } catch (e) {
                 console.error('Failed to fetch metrics', e);
                 setMetrics(DEFAULT_METRICS);
@@ -133,6 +142,35 @@ export function RoutineGrid() {
         };
         fetchMetrics();
     }, [selectedDate]);
+
+    const [averages, setAverages] = useState({ weight: '', steps: '' });
+
+    const calculateAverages = (history: any[]) => {
+        if (!Array.isArray(history) || history.length === 0) {
+            setAverages({ weight: '', steps: '' });
+            return;
+        }
+
+        // Weight Average
+        const weightReadings = history
+            .map(h => parseFloat(h.weight))
+            .filter(w => !isNaN(w) && w > 0);
+
+        const avgWeight = weightReadings.length > 0
+            ? (weightReadings.reduce((a, b) => a + b, 0) / weightReadings.length).toFixed(1)
+            : '';
+
+        // Steps Average
+        const stepsReadings = history
+            .map(h => parseInt(h.steps))
+            .filter(s => !isNaN(s) && s > 0);
+
+        const avgSteps = stepsReadings.length > 0
+            ? Math.round(stepsReadings.reduce((a, b) => a + b, 0) / stepsReadings.length).toString()
+            : '';
+
+        setAverages({ weight: avgWeight, steps: avgSteps });
+    };
 
     const handleDateChange = (days: number) => {
         const newDate = new Date(selectedDate);
@@ -364,20 +402,27 @@ export function RoutineGrid() {
                                 unit="lbs"
                                 isEditing={isEditingMetrics}
                                 onChange={(v) => handleMetricChange('weight', v)}
+                                color="blue"
+                                average={averages.weight}
                             />
                             <MetricInput
                                 icon={Footprints}
                                 label="Steps"
                                 value={metrics.steps}
+                                unit="steps"
                                 isEditing={isEditingMetrics}
                                 onChange={(v) => handleMetricChange('steps', v)}
+                                color="green"
+                                average={averages.steps}
                             />
                             <MetricInput
                                 icon={Flame}
                                 label="Calories"
                                 value={metrics.calories}
+                                unit="kcal"
                                 isEditing={isEditingMetrics}
                                 onChange={(v) => handleMetricChange('calories', v)}
+                                color="orange"
                             />
                             <MetricInput
                                 icon={Heart}
@@ -386,6 +431,7 @@ export function RoutineGrid() {
                                 unit="bpm"
                                 isEditing={isEditingMetrics}
                                 onChange={(v) => handleMetricChange('rhr', v)}
+                                color="red"
                             />
                             <MetricInput
                                 icon={Activity}
@@ -394,6 +440,7 @@ export function RoutineGrid() {
                                 unit="ms"
                                 isEditing={isEditingMetrics}
                                 onChange={(v) => handleMetricChange('hrv', v)}
+                                color="purple"
                             />
                             <MetricInput
                                 icon={Timer}
@@ -402,6 +449,7 @@ export function RoutineGrid() {
                                 unit="min"
                                 isEditing={isEditingMetrics}
                                 onChange={(v) => handleMetricChange('exercise', v)}
+                                color="teal"
                             />
                         </div>
                     </div>
@@ -439,6 +487,86 @@ function RoutineColumn({
     colorClass,
     headerColor
 }: RoutineColumnProps) {
+    const [checkedItems, setCheckedItems] = useState<Record<string, boolean>>({});
+
+    // Load checked state from local storage
+    useEffect(() => {
+        const today = new Date().toISOString().split('T')[0];
+        const key = `routine_checks_${title}_${today}`;
+        const saved = localStorage.getItem(key);
+        if (saved) {
+            setCheckedItems(JSON.parse(saved));
+        } else {
+            // Reset if new day (implicit by unique key per day)
+            setCheckedItems({});
+        }
+    }, [title]);
+
+    const handleCheck = (lineIndex: number) => {
+        const today = new Date().toISOString().split('T')[0];
+        const key = `routine_checks_${title}_${today}`;
+
+        const newChecked = {
+            ...checkedItems,
+            [lineIndex]: !checkedItems[lineIndex]
+        };
+
+        setCheckedItems(newChecked);
+        localStorage.setItem(key, JSON.stringify(newChecked));
+    };
+
+    const renderContent = () => {
+        if (isEditing) {
+            return (
+                <textarea
+                    value={tempValue}
+                    onChange={(e) => onChange(e.target.value)}
+                    className="w-full h-[400px] bg-gray-800/50 border border-gray-700 rounded-lg p-3 text-sm text-gray-200 focus:outline-none focus:border-blue-500/50 resize-none font-mono"
+                />
+            );
+        }
+
+        return (
+            <div className="space-y-1">
+                {content.split('\n').map((line, i) => {
+                    // Check if line is a list item (starts with * or -)
+                    const isListItem = line.trim().startsWith('*') || line.trim().startsWith('-');
+                    const isNumberedList = /^\d+\./.test(line.trim());
+
+                    if (isListItem || isNumberedList) {
+                        const isChecked = checkedItems[i] || false;
+                        const cleanLine = line.replace(/^[\*\-]\s*/, '').replace(/^\d+\.\s*/, '');
+
+                        return (
+                            <div
+                                key={i}
+                                className={`flex items-start gap-2 p-1 rounded hover:bg-gray-800/50 transition-colors cursor-pointer group ${isChecked ? 'opacity-50' : ''}`}
+                                onClick={() => handleCheck(i)}
+                            >
+                                <div className={`mt-1 w-4 h-4 rounded border flex items-center justify-center transition-colors ${isChecked
+                                    ? 'bg-green-500/20 border-green-500/50 text-green-400'
+                                    : 'border-gray-600 group-hover:border-gray-500'
+                                    }`}>
+                                    {isChecked && <CheckCircle2 size={10} />}
+                                </div>
+                                <span className={`text-sm font-mono leading-relaxed ${isChecked ? 'line-through text-gray-500' : 'text-gray-300'}`}>
+                                    {isNumberedList ? line.trim() : cleanLine}
+                                </span>
+                            </div>
+                        );
+                    }
+
+                    // Regular text (headers, empty lines, etc)
+                    return (
+                        <div key={i} className="text-gray-300 text-sm font-mono leading-relaxed min-h-[1.2em]">
+                            {line}
+                        </div>
+                    );
+                })}
+            </div>
+        );
+    };
+
     return (
         <div className={`rounded-xl border ${colorClass} overflow-hidden flex flex-col h-full`}>
             <div className="p-4 border-b border-gray-800/50 flex items-center justify-between bg-gray-900/50">
@@ -473,49 +601,60 @@ function RoutineColumn({
                 </div>
             </div>
 
-            <div className="p-4 flex-1">
-                {isEditing ? (
-                    <textarea
-                        value={tempValue}
-                        onChange={(e) => onChange(e.target.value)}
-                        className="w-full h-[400px] bg-gray-800/50 border border-gray-700 rounded-lg p-3 text-sm text-gray-200 focus:outline-none focus:border-blue-500/50 resize-none font-mono"
-                    />
-                ) : (
-                    <div className="prose prose-invert prose-sm max-w-none whitespace-pre-wrap text-gray-300 text-sm font-mono leading-relaxed">
-                        {content}
-                    </div>
-                )}
+            <div className="p-4 flex-1 overflow-y-auto max-h-[500px]">
+                {renderContent()}
             </div>
         </div>
     );
 }
 
-function MetricInput({ icon: Icon, label, value, unit, isEditing, onChange }: { icon: any, label: string, value: string, unit?: string, isEditing: boolean, onChange: (val: string) => void }) {
+interface MetricInputProps {
+    icon: any;
+    label: string;
+    value: string;
+    unit: string;
+    isEditing: boolean;
+    onChange: (val: string) => void;
+    color: string;
+    average?: string;
+}
+
+function MetricInput({ icon: Icon, label, value, unit, isEditing, onChange, color, average }: MetricInputProps) {
     return (
-        <div className="bg-gray-800/50 rounded-lg p-3 border border-gray-700/50">
-            <div className="flex items-center gap-2 mb-2 text-gray-400">
-                <Icon size={14} />
-                <span className="text-xs font-medium uppercase tracking-wider">{label}</span>
+        <div className="bg-gray-900/50 rounded-lg p-3 border border-gray-800/50">
+            <div className="flex items-center gap-2 mb-2">
+                <div className={`p-1.5 rounded-md bg-${color}-500/10 text-${color}-400`}>
+                    <Icon size={16} />
+                </div>
+                <span className="text-xs text-gray-400 font-medium uppercase tracking-wider">{label}</span>
             </div>
-            <div className="flex items-baseline gap-1 h-6">
-                {isEditing ? (
-                    <>
-                        <input
-                            type="text"
-                            value={value}
-                            onChange={(e) => onChange(e.target.value)}
-                            className="w-full bg-transparent text-white font-mono font-medium focus:outline-none placeholder-gray-600 border-b border-gray-700 focus:border-blue-500"
-                            placeholder="-"
-                        />
-                        {unit && <span className="text-xs text-gray-500">{unit}</span>}
-                    </>
-                ) : (
+
+            {isEditing ? (
+                <div className="flex items-baseline gap-1">
+                    <input
+                        type="text"
+                        value={value}
+                        onChange={(e) => onChange(e.target.value)}
+                        className="w-full bg-gray-800 border border-gray-700 rounded px-2 py-1 text-lg font-bold text-white focus:outline-none focus:border-blue-500"
+                        placeholder="0"
+                    />
+                    <span className="text-xs text-gray-500">{unit}</span>
+                </div>
+            ) : (
+                <div>
                     <div className="flex items-baseline gap-1">
-                        <span className="text-white font-mono font-medium">{value || '-'}</span>
-                        {value && unit && <span className="text-xs text-gray-500">{unit}</span>}
+                        <span className="text-2xl font-bold text-white tracking-tight">
+                            {value || '--'}
+                        </span>
+                        <span className="text-xs text-gray-500 font-medium">{unit}</span>
                     </div>
-                )}
-            </div>
+                    {average && (
+                        <div className="text-[10px] text-gray-500 mt-1">
+                            7d avg: <span className="text-gray-400">{average}</span>
+                        </div>
+                    )}
+                </div>
+            )}
         </div>
     );
 }

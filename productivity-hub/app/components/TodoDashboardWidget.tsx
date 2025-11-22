@@ -65,6 +65,25 @@ export function TodoDashboardWidget() {
                         </Link>
                     </div>
 
+                    {/* Progress Bar */}
+                    {todayTasks.length > 0 && (
+                        <div className="mb-6">
+                            <div className="flex items-center justify-between text-xs text-gray-400 mb-2">
+                                <span>Daily Progress</span>
+                                <span>{Math.round((todayTasks.filter(t => t.completed).length / todayTasks.length) * 100)}%</span>
+                            </div>
+                            <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
+                                <div
+                                    className="h-full bg-gradient-to-r from-orange-500 to-red-500 transition-all duration-500"
+                                    style={{ width: `${(todayTasks.filter(t => t.completed).length / todayTasks.length) * 100}%` }}
+                                />
+                            </div>
+                            <p className="text-xs text-gray-500 mt-2 text-center">
+                                {todayTasks.filter(t => t.completed).length} of {todayTasks.length} tasks completed
+                            </p>
+                        </div>
+                    )}
+
                     <div className="space-y-3">
                         {todayTasks.length === 0 ? (
                             <p className="text-gray-500 text-sm text-center py-4">
