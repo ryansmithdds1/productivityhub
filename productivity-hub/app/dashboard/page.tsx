@@ -7,6 +7,7 @@ import { TodoDashboardWidget } from '@/app/components/TodoDashboardWidget';
 import { YouTubeStats } from '@/app/components/YouTubeStats';
 import { YouTubeLatestVideos } from '@/app/components/YouTubeLatestVideos';
 import { RoutineGrid } from '@/app/components/RoutineGrid';
+import { HabitStreaks } from '@/app/components/HabitStreaks';
 
 export default async function DashboardPage() {
     const session = await getServerSession(authOptions);
@@ -32,6 +33,9 @@ export default async function DashboardPage() {
 
                 {/* Daily Routines */}
                 <RoutineGrid />
+
+                {/* Habit Streaks */}
+                <HabitStreaks />
 
                 {/* YouTube Stats */}
                 <YouTubeStats
