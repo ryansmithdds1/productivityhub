@@ -277,32 +277,10 @@ export default function WeeklyPlanningPage() {
                                         <ChevronRight className="text-gray-600 group-hover:text-blue-400 transition-colors" size={20} />
                                     </div>
 
-                                    {/* Inline Goal Preview */}
+                                    {/* Goals count */}
                                     {plan.goals && (
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                                            {plan.goals.business && plan.goals.business.length > 0 && (
-                                                <div>
-                                                    <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Business Focus</span>
-                                                    <ul className="mt-1 space-y-1">
-                                                        {plan.goals.business.slice(0, 3).map((g, i) => (
-                                                            <li key={i} className="text-gray-300 truncate">• {g}</li>
-                                                        ))}
-                                                        {plan.goals.business.length > 3 && (
-                                                            <li className="text-gray-500 text-xs pl-2">+{plan.goals.business.length - 3} more</li>
-                                                        )}
-                                                    </ul>
-                                                </div>
-                                            )}
-                                            {plan.goals.content && plan.goals.content.length > 0 && (
-                                                <div>
-                                                    <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Content</span>
-                                                    <ul className="mt-1 space-y-1">
-                                                        {plan.goals.content.slice(0, 3).map((g, i) => (
-                                                            <li key={i} className="text-gray-300 truncate">• {g}</li>
-                                                        ))}
-                                                    </ul>
-                                                </div>
-                                            )}
+                                        <div className="text-sm text-gray-400 mt-2">
+                                            {Object.values(plan.goals).filter(g => g && g.length > 0).length} goal categories
                                         </div>
                                     )}
                                 </div>
