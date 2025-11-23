@@ -424,5 +424,6 @@ export function DayPlanner({ date, tasks, onTaskUpdate, onEditTask, onDateChange
                     </div>
                 </div>
             </div>
-            );
+        </div>
+    );
 }
