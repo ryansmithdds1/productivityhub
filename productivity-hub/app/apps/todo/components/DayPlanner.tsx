@@ -143,23 +143,27 @@ export function DayPlanner({ date, tasks, onTaskUpdate, onEditTask }: DayPlanner
     const handleQuickAdd = async (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key !== 'Enter' || !quickAddValue.trim()) return;
 
-        const newTask: Task = {
-            id: crypto.randomUUID(),
-            title: quickAddValue.trim(),
-            dueDate: date,
-            completed: false,
-            category: 'personal',
-            priority: 'medium',
-            createdAt: Date.now(),
-            updatedAt: Date.now(),
-        };
+        try {
+            const newTask: Task = {
+                id: crypto.randomUUID(),
+                title: quickAddValue.trim(),
+                dueDate: date,
+                completed: false,
+                category: 'personal',
+                priority: 'medium',
+                createdAt: Date.now(),
+                updatedAt: Date.now(),
+            };
 
-        await storage.saveTask(newTask);
-        setQuickAddValue('');
-        await onTaskUpdate();
+            await storage.saveTask(newTask);
+            setQuickAddValue('');
+            onTaskUpdate(); // Trigger parent component to reload tasks
 
-        // Keep focus in the input for rapid entry
-        setTimeout(() => quickAddInputRef.current?.focus(), 0);
+            // Keep focus in the input for rapid entry
+            setTimeout(() => quickAddInputRef.current?.focus(), 0);
+        } catch (error) {
+            console.error('Failed to create quick task:', error);
+        }
     };
 
     return (
