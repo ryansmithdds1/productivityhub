@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Plus, ChevronLeft, ChevronRight, ListTodo as ListIcon, LayoutGrid, List, Calendar } from 'lucide-react';
-import { DashboardLayout } from '@/app/components/DashboardLayout';
+
 import { DayPlanner } from './components/DayPlanner';
 import { ListView } from './components/ListView';
 import { MaintenancePlanner } from './components/MaintenancePlanner';
@@ -73,7 +73,7 @@ export default function TodoApp() {
     };
 
     return (
-        <DashboardLayout>
+        <>
             {/* Header */}
             <div className="bg-gray-900 border-b border-gray-800 sticky top-0 z-10">
                 <div className="px-8 py-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -230,6 +230,6 @@ export default function TodoApp() {
                 defaultDate={currentDate}
                 task={editingTask}
             />
-        </DashboardLayout>
+        </>
     );
 }
