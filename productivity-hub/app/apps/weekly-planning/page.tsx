@@ -69,19 +69,43 @@ export default function WeeklyPlanningPage() {
                                     </ul>
                                 </div>
                             )}
-                            {plan.goals?.business && plan.goals.business.length > 0 && (
+                            {plan.goals?.dentalPractices && plan.goals.dentalPractices.length > 0 && (
                                 <div>
-                                    <p className="text-sm font-medium text-gray-400 mb-2">Business</p>
+                                    <p className="text-sm font-medium text-gray-400 mb-2">Dental Practices</p>
                                     <ul className="list-disc list-inside text-gray-300 bg-gray-950 p-4 rounded-lg">
-                                        {plan.goals.business.map((g, i) => <li key={i}>{g}</li>)}
+                                        {plan.goals.dentalPractices.map((g, i) => <li key={i}>{g}</li>)}
                                     </ul>
                                 </div>
                             )}
-                            {plan.goals?.content && plan.goals.content.length > 0 && (
+                            {plan.goals?.ryanSmithDDS && plan.goals.ryanSmithDDS.length > 0 && (
                                 <div>
-                                    <p className="text-sm font-medium text-gray-400 mb-2">Content</p>
+                                    <p className="text-sm font-medium text-gray-400 mb-2">Ryan Smith DDS</p>
                                     <ul className="list-disc list-inside text-gray-300 bg-gray-950 p-4 rounded-lg">
-                                        {plan.goals.content.map((g, i) => <li key={i}>{g}</li>)}
+                                        {plan.goals.ryanSmithDDS.map((g, i) => <li key={i}>{g}</li>)}
+                                    </ul>
+                                </div>
+                            )}
+                            {plan.goals?.assistingSchool && plan.goals.assistingSchool.length > 0 && (
+                                <div>
+                                    <p className="text-sm font-medium text-gray-400 mb-2">Assisting School</p>
+                                    <ul className="list-disc list-inside text-gray-300 bg-gray-950 p-4 rounded-lg">
+                                        {plan.goals.assistingSchool.map((g, i) => <li key={i}>{g}</li>)}
+                                    </ul>
+                                </div>
+                            )}
+                            {plan.goals?.equityDental && plan.goals.equityDental.length > 0 && (
+                                <div>
+                                    <p className="text-sm font-medium text-gray-400 mb-2">Equity Dental</p>
+                                    <ul className="list-disc list-inside text-gray-300 bg-gray-950 p-4 rounded-lg">
+                                        {plan.goals.equityDental.map((g, i) => <li key={i}>{g}</li>)}
+                                    </ul>
+                                </div>
+                            )}
+                            {plan.goals?.courses && plan.goals.courses.length > 0 && (
+                                <div>
+                                    <p className="text-sm font-medium text-gray-400 mb-2">Courses</p>
+                                    <ul className="list-disc list-inside text-gray-300 bg-gray-950 p-4 rounded-lg">
+                                        {plan.goals.courses.map((g, i) => <li key={i}>{g}</li>)}
                                     </ul>
                                 </div>
                             )}
