@@ -208,17 +208,20 @@ export default function WeeklyPlanningPage() {
 
                 {/* Overview Card */}
                 <div className="bg-gradient-to-br from-blue-600/20 to-purple-600/20 border border-blue-500/30 rounded-xl p-6">
-                    <h2 className="text-xl font-bold text-white mb-4">8-Step Workflow</h2>
+                    <h2 className="text-xl font-bold text-white mb-4">11-Step Workflow</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                         {[
                             { step: 1, title: 'Prep & Brain Dump', time: '5 min' },
                             { step: 2, title: 'Reflection', time: '5 min' },
                             { step: 3, title: 'Spiritual Goals', time: '10 min' },
                             { step: 4, title: 'Personal/Family', time: '10 min' },
-                            { step: 5, title: 'Business Goals', time: '15 min' },
-                            { step: 6, title: 'Content Goals', time: '10 min' },
-                            { step: 7, title: 'Roadblocks', time: '5 min' },
-                            { step: 8, title: 'Commit', time: '5 min' },
+                            { step: 5, title: 'Dental Practices', time: '10 min' },
+                            { step: 6, title: 'Ryan Smith DDS', time: '10 min' },
+                            { step: 7, title: 'Assisting School', time: '10 min' },
+                            { step: 8, title: 'Equity Dental', time: '10 min' },
+                            { step: 9, title: 'Courses', time: '10 min' },
+                            { step: 10, title: 'Roadblocks', time: '5 min' },
+                            { step: 11, title: 'Commit', time: '5 min' },
                         ].map(({ step, title, time }) => (
                             <div key={step} className="bg-gray-900/50 rounded-lg p-3">
                                 <div className="flex items-center gap-2 mb-1">
