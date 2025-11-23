@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { DashboardLayout } from '@/app/components/DashboardLayout';
+
 import { Plus, Pencil, Trash2, Save, X, ArrowLeft, Dumbbell } from 'lucide-react';
 import Link from 'next/link';
 import { storage } from '../lib/storage';
@@ -73,7 +73,7 @@ export default function ExercisesPage() {
     }, {} as Record<string, Exercise[]>);
 
     return (
-        <DashboardLayout>
+        <>
             <div className="p-8 space-y-8">
                 {/* Header */}
                 <div className="flex items-center justify-between">
@@ -205,6 +205,6 @@ export default function ExercisesPage() {
                     ))}
                 </div>
             </div>
-        </DashboardLayout>
+        </>
     );
 }

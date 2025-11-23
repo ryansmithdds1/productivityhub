@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Plus, ChevronLeft, ChevronRight, Calendar as CalendarIcon, Table, Grid3x3, ListTodo } from 'lucide-react';
-import { DashboardLayout } from '@/app/components/DashboardLayout';
+
 import { storage, createDefaultNewsletter } from './lib/storage';
 import { getWeekStart, formatWeekRange } from './lib/utils';
 import { ProgressBars } from './components/ProgressBars';
@@ -138,7 +138,7 @@ export default function ContentCalendarApp() {
     const newsletters = weekContent.filter(c => c.type === 'newsletter');
 
     return (
-        <DashboardLayout>
+        <>
             {/* Header */}
             <div className="bg-gray-900 border-b border-gray-800 sticky top-0 z-10">
                 <div className="px-8 py-6">
@@ -379,6 +379,6 @@ export default function ContentCalendarApp() {
                 }}
                 weekStart={currentWeekStart}
             />
-        </DashboardLayout>
+        </>
     );
 }

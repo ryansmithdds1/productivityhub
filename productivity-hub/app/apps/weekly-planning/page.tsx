@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { DashboardLayout } from '@/app/components/DashboardLayout';
+
 import { Calendar, Play, Clock, CheckCircle, ChevronRight } from 'lucide-react';
 import { PlanningWizard } from './components/PlanningWizard';
 import { WeekSelectionModal } from './components/WeekSelectionModal';
@@ -152,7 +152,7 @@ export default function WeeklyPlanningPage() {
 
     if (isPlanning) {
         return (
-            <DashboardLayout>
+            <>
                 <div className="p-8">
                     <PlanningWizard
                         onComplete={handleCompletePlanning}
@@ -160,12 +160,12 @@ export default function WeeklyPlanningPage() {
                         weekOf={planningDate}
                     />
                 </div>
-            </DashboardLayout>
+            </>
         );
     }
 
     return (
-        <DashboardLayout>
+        <>
             <div className="p-8 space-y-8">
                 {/* Header */}
                 <div className="flex items-center justify-between">
@@ -301,6 +301,6 @@ export default function WeeklyPlanningPage() {
                     onSelect={handleWeekSelected}
                 />
             )}
-        </DashboardLayout>
+        </>
     );
 }

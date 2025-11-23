@@ -1,6 +1,6 @@
 'use client';
 
-import { DashboardLayout } from '@/app/components/DashboardLayout';
+
 import { Apple, ExternalLink } from 'lucide-react';
 
 export default function DietTrackerPage() {
@@ -8,7 +8,7 @@ export default function DietTrackerPage() {
     const embedUrl = 'https://docs.google.com/spreadsheets/d/1pRsOYo9aL0IweSM5HppbS8qpX8Rcp7R-Kp0n6aN2zsM/edit?usp=sharing&widget=true&headers=false';
 
     return (
-        <DashboardLayout>
+        <>
             <div className="h-full flex flex-col">
                 {/* Header */}
                 <header className="bg-gray-900 border-b border-gray-800 p-6">
@@ -45,6 +45,6 @@ export default function DietTrackerPage() {
                     </div>
                 </div>
             </div>
-        </DashboardLayout>
+        </>
     );
 }

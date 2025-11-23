@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { DashboardLayout } from '@/app/components/DashboardLayout';
+
 import { Dumbbell, History, Calendar, TrendingUp, Plus } from 'lucide-react';
 import { WorkoutLogger } from './components/WorkoutLogger';
 import { storage } from './lib/storage';
@@ -34,7 +34,7 @@ export default function WorkoutApp() {
 
     if (isLogging) {
         return (
-            <DashboardLayout>
+            <>
                 <div className="p-8">
                     <WorkoutLogger
                         templateName={activeTemplate}
@@ -42,12 +42,12 @@ export default function WorkoutApp() {
                         onCancel={() => setIsLogging(false)}
                     />
                 </div>
-            </DashboardLayout>
+            </>
         );
     }
 
     return (
-        <DashboardLayout>
+        <>
             <div className="p-8 space-y-8">
                 {/* Header */}
                 <div className="flex items-center justify-between">
@@ -148,6 +148,6 @@ export default function WorkoutApp() {
                     </div>
                 </div>
             </div>
-        </DashboardLayout>
+        </>
     );
 }

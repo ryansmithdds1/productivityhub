@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { DashboardLayout } from '@/app/components/DashboardLayout';
+
 import { ArrowLeft, TrendingUp, Calendar, Award, Activity } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { storage } from '../lib/storage';
@@ -77,7 +77,7 @@ export default function ProgressPage() {
     const selectedExerciseName = exercises.find(e => e.id === selectedExercise)?.name || '';
 
     return (
-        <DashboardLayout>
+        <>
             <div className="p-8 space-y-8">
                 {/* Header */}
                 <div className="flex items-center gap-4">
@@ -233,6 +233,6 @@ export default function ProgressPage() {
                     </div>
                 </div>
             </div>
-        </DashboardLayout>
+        </>
     );
 }
