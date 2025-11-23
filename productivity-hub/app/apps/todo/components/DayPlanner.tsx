@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { Clock, Layers, Filter, ChevronRight, ChevronDown } from 'lucide-react';
+import { Clock, Layers, Filter, ChevronRight, ChevronDown, ChevronLeft, Plus } from 'lucide-react';
 import type { Task } from '../types';
 import { formatTime } from '../lib/utils';
 import { TaskCard } from './TaskCard';
@@ -12,6 +12,8 @@ interface DayPlannerProps {
     tasks: Task[];
     onTaskUpdate: () => void;
     onEditTask: (task: Task) => void;
+    onDateChange: (newDate: number) => void;
+    onToday: () => void;
 }
 
 const START_HOUR = 5;
@@ -19,7 +21,7 @@ const END_HOUR = 23;
 const HOURS = Array.from({ length: END_HOUR - START_HOUR }, (_, i) => i + START_HOUR);
 const HOUR_HEIGHT = 80; // px
 
-export function DayPlanner({ date, tasks, onTaskUpdate, onEditTask }: DayPlannerProps) {
+export function DayPlanner({ date, tasks, onTaskUpdate, onEditTask, onDateChange, onToday }: DayPlannerProps) {
     const [draggedTask, setDraggedTask] = useState<Task | null>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const [groupBy, setGroupBy] = useState<'none' | 'category' | 'priority'>('category');
@@ -185,6 +187,18 @@ export function DayPlanner({ date, tasks, onTaskUpdate, onEditTask }: DayPlanner
         }
     };
 
+    const goToPreviousDay = () => {
+        const newDate = new Date(date);
+        newDate.setDate(newDate.getDate() - 1);
+        onDateChange(newDate.setHours(0, 0, 0, 0));
+    };
+
+    const goToNextDay = () => {
+        const newDate = new Date(date);
+        newDate.setDate(newDate.getDate() + 1);
+        onDateChange(newDate.setHours(0, 0, 0, 0));
+    };
+
     return (
         <div className="grid grid-cols-[350px_1fr] gap-6 h-[calc(100vh-200px)]">
             {/* Unscheduled Tasks Sidebar */}
@@ -320,57 +334,95 @@ export function DayPlanner({ date, tasks, onTaskUpdate, onEditTask }: DayPlanner
                 </div>
             </div>
 
-            {/* Time Grid Container */}
-            <div
-                className="bg-gray-900 border border-gray-800 rounded-xl overflow-y-auto relative select-none"
-                ref={containerRef}
-                onDragOver={handleDragOver}
-                onDrop={handleDrop}
-            >
-                <div className="relative min-h-full" style={{ height: `${HOURS.length * HOUR_HEIGHT}px` }}>
-                    {/* Grid Lines */}
-                    {HOURS.map(hour => (
-                        <div
-                            key={hour}
-                            className="absolute w-full border-b border-gray-800/50 flex items-start"
-                            style={{
-                                top: `${(hour - START_HOUR) * HOUR_HEIGHT}px`,
-                                height: `${HOUR_HEIGHT}px`
-                            }}
-                        >
-                            <div className="w-[60px] p-2 text-xs text-gray-500 font-medium text-right pr-4 sticky left-0">
-                                {formatTime(`${hour.toString().padStart(2, '0')}:00`)}
+            {/* Timeline Section with Date Navigation */}
+            <div className="flex flex-col gap-4">
+                {/* Date Navigation */}
+                <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                            <button
+                                onClick={goToPreviousDay}
+                                className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
+                            >
+                                <ChevronLeft size={20} className="text-gray-400" />
+                            </button>
+                            <div className="text-center">
+                                <h2 className="text-lg font-semibold text-white">
+                                    {new Date(date).toLocaleDateString('en-US', {
+                                        weekday: 'long',
+                                        month: 'long',
+                                        day: 'numeric',
+                                        year: 'numeric'
+                                    })}
+                                </h2>
                             </div>
-                            {/* Half-hour marker */}
-                            <div className="absolute top-1/2 left-[60px] right-0 border-t border-gray-800/30 border-dashed" />
+                            <button
+                                onClick={goToNextDay}
+                                className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
+                            >
+                                <ChevronRight size={20} className="text-gray-400" />
+                            </button>
                         </div>
-                    ))}
-
-                    {/* Scheduled Tasks Overlay */}
-                    {scheduledTasks.map(task => (
-                        <div
-                            key={task.id}
-                            style={getTaskStyle(task)}
-                            draggable
-                            onDragStart={(e) => {
-                                // Prevent drag if resizing
-                                if ((e.target as HTMLElement).closest('.resize-handle')) {
-                                    e.preventDefault();
-                                    return;
-                                }
-                                handleDragStart(task);
-                            }}
-                            className="absolute transition-all duration-200 cursor-move hover:z-20"
+                        <button
+                            onClick={onToday}
+                            className="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg transition-colors"
                         >
-                            <TaskCard
-                                task={task}
-                                onUpdate={onTaskUpdate}
-                                onEdit={() => onEditTask(task)}
-                            />
-                        </div>
-                    ))}
+                            Today
+                        </button>
+                    </div>
+                </div>
+
+                {/* Time Grid Container */}
+                <div
+                    className="bg-gray-900 border border-gray-800 rounded-xl overflow-y-auto relative select-none flex-1"
+                    ref={containerRef}
+                    onDragOver={handleDragOver}
+                    onDrop={handleDrop}
+                >
+                    <div className="relative min-h-full" style={{ height: `${HOURS.length * HOUR_HEIGHT}px` }}>
+                        {/* Grid Lines */}
+                        {HOURS.map(hour => (
+                            <div
+                                key={hour}
+                                className="absolute w-full border-b border-gray-800/50 flex items-start"
+                                style={{
+                                    top: `${(hour - START_HOUR) * HOUR_HEIGHT}px`,
+                                    height: `${HOUR_HEIGHT}px`
+                                }}
+                            >
+                                <div className="w-[60px] p-2 text-xs text-gray-500 font-medium text-right pr-4 sticky left-0">
+                                    {formatTime(`${hour.toString().padStart(2, '0')}:00`)}
+                                </div>
+                                {/* Half-hour marker */}
+                                <div className="absolute top-1/2 left-[60px] right-0 border-t border-gray-800/30 border-dashed" />
+                            </div>
+                        ))}
+
+                        {/* Scheduled Tasks Overlay */}
+                        {scheduledTasks.map(task => (
+                            <div
+                                key={task.id}
+                                style={getTaskStyle(task)}
+                                draggable
+                                onDragStart={(e) => {
+                                    // Prevent drag if resizing
+                                    if ((e.target as HTMLElement).closest('.resize-handle')) {
+                                        e.preventDefault();
+                                        return;
+                                    }
+                                    handleDragStart(task);
+                                }}
+                                className="absolute transition-all duration-200 cursor-move hover:z-20"
+                            >
+                                <TaskCard
+                                    task={task}
+                                    onUpdate={onTaskUpdate}
+                                    onEdit={() => onEditTask(task)}
+                                />
+                            </div>
+                        ))}
+                    </div>
                 </div>
             </div>
-        </div>
-    );
+            );
 }

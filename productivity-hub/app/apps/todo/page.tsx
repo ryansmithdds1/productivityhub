@@ -142,51 +142,6 @@ export default function TodoApp() {
                     />
                 ) : (
                     <>
-                        {/* Date Navigation */}
-                        <div className="flex flex-col md:flex-row items-center justify-between mb-6 gap-4">
-                            <div className="flex items-center gap-4 w-full md:w-auto justify-between md:justify-start">
-                                <button
-                                    onClick={goToPreviousDay}
-                                    className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
-                                >
-                                    <ChevronLeft size={20} className="text-gray-400" />
-                                </button>
-                                <div className="text-center">
-                                    <h2 className="text-lg md:text-xl font-semibold text-white">
-                                        {new Date(currentDate).toLocaleDateString('en-US', {
-                                            weekday: 'long',
-                                            month: 'long',
-                                            day: 'numeric',
-                                            year: 'numeric'
-                                        })}
-                                    </h2>
-                                </div>
-                                <button
-                                    onClick={goToNextDay}
-                                    className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
-                                >
-                                    <ChevronRight size={20} className="text-gray-400" />
-                                </button>
-                            </div>
-
-                            <div className="flex items-center gap-2 w-full md:w-auto">
-                                <button
-                                    onClick={goToToday}
-                                    className="flex-1 md:flex-none px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg transition-colors"
-                                >
-                                    Today
-                                </button>
-                                <button
-                                    onClick={() => setShowTaskModal(true)}
-                                    className="flex-1 md:flex-none px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-colors flex items-center justify-center gap-2"
-                                >
-                                    <Plus size={18} />
-                                    <span className="hidden md:inline">New Task</span>
-                                    <span className="md:hidden">New</span>
-                                </button>
-                            </div>
-                        </div>
-
                         {/* View Content */}
                         {viewMode === 'grid' ? (
                             <div className="hidden md:block">
@@ -195,6 +150,8 @@ export default function TodoApp() {
                                     tasks={tasks}
                                     onTaskUpdate={handleTaskUpdate}
                                     onEditTask={handleEditTask}
+                                    onDateChange={(newDate) => setCurrentDate(newDate)}
+                                    onToday={goToToday}
                                 />
                             </div>
                         ) : (
