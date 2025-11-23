@@ -27,18 +27,37 @@ export function DayPlanner({ date, tasks, onTaskUpdate, onEditTask }: DayPlanner
     const [quickAddValue, setQuickAddValue] = useState('');
     const quickAddInputRef = useRef<HTMLInputElement>(null);
 
-    // Filter tasks for this day
+    // Filter tasks for the timeline (only today's scheduled tasks)
     const dayTasks = tasks.filter(t => t.dueDate === date && !t.completed);
     const scheduledTasks = dayTasks.filter(t => t.timeBlock);
-    const unscheduledTasks = dayTasks.filter(t => !t.timeBlock);
 
-    // Group tasks
-    const getGroupedTasks = () => {
-        if (groupBy === 'none') return { 'All Tasks': unscheduledTasks };
+    // Get ALL uncompleted tasks for the sidebar
+    const allUncompletedTasks = tasks.filter(t => !t.completed);
+
+    // Separate today's unscheduled from all other tasks
+    const todayUnscheduled = allUncompletedTasks.filter(t => t.dueDate === date && !t.timeBlock);
+    const otherTasks = allUncompletedTasks.filter(t => !(t.dueDate === date && !t.timeBlock));
+
+    // Group other tasks by date
+    const tasksByDate = otherTasks.reduce((acc, task) => {
+        const dateKey = task.dueDate;
+        if (!acc[dateKey]) acc[dateKey] = [];
+        acc[dateKey].push(task);
+        return acc;
+    }, {} as Record<number, Task[]>);
+
+    // Sort dates
+    const sortedDates = Object.keys(tasksByDate)
+        .map(Number)
+        .sort((a, b) => a - b);
+
+    // Group today's unscheduled tasks
+    const getGroupedTasks = (taskList: Task[]) => {
+        if (groupBy === 'none') return { 'All Tasks': taskList };
 
         const groups: Record<string, Task[]> = {};
 
-        unscheduledTasks.forEach(task => {
+        taskList.forEach(task => {
             const key = groupBy === 'category' ? task.category : task.priority;
             const label = key.charAt(0).toUpperCase() + key.slice(1);
             if (!groups[label]) groups[label] = [];
@@ -58,7 +77,7 @@ export function DayPlanner({ date, tasks, onTaskUpdate, onEditTask }: DayPlanner
         return groups;
     };
 
-    const groupedTasks = getGroupedTasks();
+    const groupedTodayTasks = getGroupedTasks(todayUnscheduled);
 
     const toggleGroup = (group: string) => {
         setExpandedGroups(prev => ({
@@ -206,49 +225,97 @@ export function DayPlanner({ date, tasks, onTaskUpdate, onEditTask }: DayPlanner
                 </div>
 
                 <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                    {unscheduledTasks.length === 0 ? (
-                        <p className="text-gray-600 text-sm text-center py-4">
-                            All tasks scheduled!
-                        </p>
-                    ) : (
-                        Object.entries(groupedTasks).map(([group, groupTasks]) => (
-                            <div key={group} className="space-y-2">
-                                <button
-                                    onClick={() => toggleGroup(group)}
-                                    className="flex items-center gap-2 w-full text-left text-xs font-medium text-gray-500 hover:text-gray-300 transition-colors"
-                                >
-                                    {expandedGroups[group] === false ? (
-                                        <ChevronRight size={14} />
-                                    ) : (
-                                        <ChevronDown size={14} />
-                                    )}
-                                    {group}
-                                    <span className="ml-auto bg-gray-800 px-1.5 py-0.5 rounded text-[10px]">
-                                        {groupTasks.length}
-                                    </span>
-                                </button>
-
-                                {expandedGroups[group] !== false && (
-                                    <div className="space-y-2 pl-2 border-l border-gray-800 ml-1.5">
-                                        {groupTasks.map(task => (
-                                            <div
-                                                key={task.id}
-                                                draggable
-                                                onDragStart={() => handleDragStart(task)}
-                                                className="cursor-move hover:scale-[1.02] transition-transform"
-                                            >
-                                                <TaskCard
-                                                    task={task}
-                                                    compact
-                                                    onUpdate={onTaskUpdate}
-                                                    onEdit={() => onEditTask(task)}
-                                                />
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
+                    {/* Today's Unscheduled Tasks */}
+                    {todayUnscheduled.length > 0 && (
+                        <div className="space-y-4">
+                            <div className="text-xs font-bold text-blue-400 uppercase tracking-wider sticky top-0 bg-gray-900 pb-2">
+                                Today - Unscheduled
                             </div>
-                        ))
+                            {Object.entries(groupedTodayTasks).map(([group, groupTasks]) => (
+                                <div key={group} className="space-y-2">
+                                    <button
+                                        onClick={() => toggleGroup(group)}
+                                        className="flex items-center gap-2 w-full text-left text-xs font-medium text-gray-500 hover:text-gray-300 transition-colors"
+                                    >
+                                        {expandedGroups[group] === false ? (
+                                            <ChevronRight size={14} />
+                                        ) : (
+                                            <ChevronDown size={14} />
+                                        )}
+                                        {group}
+                                        <span className="ml-auto bg-gray-800 px-1.5 py-0.5 rounded text-[10px]">
+                                            {groupTasks.length}
+                                        </span>
+                                    </button>
+
+                                    {expandedGroups[group] !== false && (
+                                        <div className="space-y-2 pl-2 border-l border-gray-800 ml-1.5">
+                                            {groupTasks.map((task: Task) => (
+                                                <div
+                                                    key={task.id}
+                                                    draggable
+                                                    onDragStart={() => handleDragStart(task)}
+                                                    className="cursor-move hover:scale-[1.02] transition-transform"
+                                                >
+                                                    <TaskCard
+                                                        task={task}
+                                                        compact
+                                                        onUpdate={onTaskUpdate}
+                                                        onEdit={() => onEditTask(task)}
+                                                    />
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
+                    {/* Other Tasks Grouped by Date */}
+                    {sortedDates.length > 0 && (
+                        <div className="space-y-4">
+                            {sortedDates.map(dateKey => {
+                                const dateTasks = tasksByDate[dateKey];
+                                const dateObj = new Date(dateKey);
+                                const isToday = dateKey === date;
+                                const dayLabel = isToday
+                                    ? 'Today - Scheduled'
+                                    : dateObj.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+
+                                return (
+                                    <div key={dateKey} className="space-y-2">
+                                        <div className="text-xs font-bold text-gray-400 uppercase tracking-wider sticky top-0 bg-gray-900 pb-2">
+                                            {dayLabel}
+                                        </div>
+                                        <div className="space-y-2">
+                                            {dateTasks.map((task: Task) => (
+                                                <div
+                                                    key={task.id}
+                                                    draggable
+                                                    onDragStart={() => handleDragStart(task)}
+                                                    className="cursor-move hover:scale-[1.02] transition-transform"
+                                                >
+                                                    <TaskCard
+                                                        task={task}
+                                                        compact
+                                                        onUpdate={onTaskUpdate}
+                                                        onEdit={() => onEditTask(task)}
+                                                    />
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    )}
+
+                    {/* Empty state */}
+                    {todayUnscheduled.length === 0 && sortedDates.length === 0 && (
+                        <p className="text-gray-600 text-sm text-center py-4">
+                            No uncompleted tasks!
+                        </p>
                     )}
                 </div>
             </div>
