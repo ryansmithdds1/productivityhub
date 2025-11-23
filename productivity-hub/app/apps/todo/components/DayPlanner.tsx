@@ -5,6 +5,7 @@ import { Clock, Layers, Filter, ChevronRight, ChevronDown } from 'lucide-react';
 import type { Task } from '../types';
 import { formatTime } from '../lib/utils';
 import { TaskCard } from './TaskCard';
+import { storage } from '../lib/storage';
 
 interface DayPlannerProps {
     date: number;
@@ -23,6 +24,8 @@ export function DayPlanner({ date, tasks, onTaskUpdate, onEditTask }: DayPlanner
     const containerRef = useRef<HTMLDivElement>(null);
     const [groupBy, setGroupBy] = useState<'none' | 'category' | 'priority'>('category');
     const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
+    const [quickAddValue, setQuickAddValue] = useState('');
+    const quickAddInputRef = useRef<HTMLInputElement>(null);
 
     // Filter tasks for this day
     const dayTasks = tasks.filter(t => t.dueDate === date && !t.completed);
@@ -137,6 +140,28 @@ export function DayPlanner({ date, tasks, onTaskUpdate, onEditTask }: DayPlanner
         };
     };
 
+    const handleQuickAdd = async (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key !== 'Enter' || !quickAddValue.trim()) return;
+
+        const newTask: Task = {
+            id: crypto.randomUUID(),
+            title: quickAddValue.trim(),
+            dueDate: date,
+            completed: false,
+            category: 'personal',
+            priority: 'medium',
+            createdAt: Date.now(),
+            updatedAt: Date.now(),
+        };
+
+        await storage.saveTask(newTask);
+        setQuickAddValue('');
+        await onTaskUpdate();
+
+        // Keep focus in the input for rapid entry
+        setTimeout(() => quickAddInputRef.current?.focus(), 0);
+    };
+
     return (
         <div className="grid grid-cols-[350px_1fr] gap-6 h-[calc(100vh-200px)]">
             {/* Unscheduled Tasks Sidebar */}
@@ -161,6 +186,19 @@ export function DayPlanner({ date, tasks, onTaskUpdate, onEditTask }: DayPlanner
                             <Filter size={14} />
                         </button>
                     </div>
+                </div>
+
+                {/* Quick Add Input */}
+                <div className="px-4 pt-3 pb-2">
+                    <input
+                        ref={quickAddInputRef}
+                        type="text"
+                        value={quickAddValue}
+                        onChange={(e) => setQuickAddValue(e.target.value)}
+                        onKeyDown={handleQuickAdd}
+                        placeholder="Type task and press Enter..."
+                        className="w-full bg-gray-800/50 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:bg-gray-800 transition-all"
+                    />
                 </div>
 
                 <div className="flex-1 overflow-y-auto p-4 space-y-4">
