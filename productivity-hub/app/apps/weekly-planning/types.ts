@@ -9,8 +9,11 @@ export interface WeeklyPlan {
     goals?: {
         spiritual?: string[];
         personal?: string[];
-        business?: string[];
-        content?: string[];
+        dentalPractices?: string[];
+        ryanSmithDDS?: string[];
+        assistingSchool?: string[];
+        equityDental?: string[];
+        courses?: string[];
     };
     roadblocks?: string;
     commitment?: string;
@@ -58,27 +61,48 @@ export const PLANNING_STEPS: PlanningStep[] = [
     },
     {
         id: 5,
-        title: 'Business & Professional Goals',
-        description: 'Weekly CE, clinical help, profitability focuses. Break into tasks.',
-        suggestedMinutes: 15,
+        title: 'Dental Practices',
+        description: 'Practice management, clinical protocols, growth initiatives.',
+        suggestedMinutes: 10,
         category: 'goals'
     },
     {
         id: 6,
-        title: 'Content Creation Goals',
-        description: '2 YouTube videos, 5 shorts. Schedule in your daily content slots.',
+        title: 'Ryan Smith DDS',
+        description: 'Personal CE, clinical development, networking.',
         suggestedMinutes: 10,
         category: 'goals'
     },
     {
         id: 7,
+        title: 'Assisting School',
+        description: 'Curriculum development, student coordination, teaching prep.',
+        suggestedMinutes: 10,
+        category: 'goals'
+    },
+    {
+        id: 8,
+        title: 'Equity Dental',
+        description: 'Strategic initiatives, partnerships, business development.',
+        suggestedMinutes: 10,
+        category: 'goals'
+    },
+    {
+        id: 9,
+        title: 'Courses',
+        description: 'Content creation, platform maintenance, student support.',
+        suggestedMinutes: 10,
+        category: 'goals'
+    },
+    {
+        id: 10,
         title: 'Anticipate Roadblocks & Optimize',
         description: 'Review full week, spot overloads, add buffers or backups.',
         suggestedMinutes: 5,
         category: 'review'
     },
     {
-        id: 8,
+        id: 11,
         title: 'Close & Commit',
         description: 'Summarize actions/deadlines. Set mid-week check-in.',
         suggestedMinutes: 5,

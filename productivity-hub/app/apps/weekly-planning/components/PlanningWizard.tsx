@@ -26,8 +26,11 @@ export function PlanningWizard({ onComplete, onCancel, initialPlan, weekOf }: Pl
     const [challenges, setChallenges] = useState('');
     const [spiritualGoals, setSpiritualGoals] = useState<string[]>(['']);
     const [personalGoals, setPersonalGoals] = useState<string[]>(['']);
-    const [businessGoals, setBusinessGoals] = useState<string[]>(['']);
-    const [contentGoals, setContentGoals] = useState<string[]>(['']);
+    const [dentalPracticesGoals, setDentalPracticesGoals] = useState<string[]>(['']);
+    const [ryanSmithDDSGoals, setRyanSmithDDSGoals] = useState<string[]>(['']);
+    const [assistingSchoolGoals, setAssistingSchoolGoals] = useState<string[]>(['']);
+    const [equityDentalGoals, setEquityDentalGoals] = useState<string[]>(['']);
+    const [coursesGoals, setCoursesGoals] = useState<string[]>(['']);
     const [roadblocks, setRoadblocks] = useState('');
     const [commitment, setCommitment] = useState('');
     const [createdTasks, setCreatedTasks] = useState<string[]>([]); // Track task IDs
@@ -113,8 +116,11 @@ export function PlanningWizard({ onComplete, onCancel, initialPlan, weekOf }: Pl
             goals: {
                 spiritual: spiritualGoals.filter(g => g.trim()),
                 personal: personalGoals.filter(g => g.trim()),
-                business: businessGoals.filter(g => g.trim()),
-                content: contentGoals.filter(g => g.trim())
+                dentalPractices: dentalPracticesGoals.filter(g => g.trim()),
+                ryanSmithDDS: ryanSmithDDSGoals.filter(g => g.trim()),
+                assistingSchool: assistingSchoolGoals.filter(g => g.trim()),
+                equityDental: equityDentalGoals.filter(g => g.trim()),
+                courses: coursesGoals.filter(g => g.trim())
             },
             roadblocks,
             commitment
@@ -299,40 +305,40 @@ export function PlanningWizard({ onComplete, onCancel, initialPlan, weekOf }: Pl
                     </div>
                 );
 
-            case 4: // Business & Professional
+            case 4: // Dental Practices
                 return (
                     <div className="space-y-4">
-                        <p className="text-gray-400">Define your business and professional goals for the week.</p>
-                        {businessGoals.map((goal, i) => (
+                        <p className="text-gray-400">Practice management, clinical protocols, growth initiatives.</p>
+                        {dentalPracticesGoals.map((goal, i) => (
                             <div key={i} className="flex gap-2">
                                 <input
                                     type="text"
                                     value={goal}
-                                    onChange={(e) => updateGoalField(i, e.target.value, setBusinessGoals)}
+                                    onChange={(e) => updateGoalField(i, e.target.value, setDentalPracticesGoals)}
                                     className="flex-1 bg-gray-950 border border-gray-800 rounded-lg px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
-                                    placeholder="e.g., Complete CE course, Review staffing Monday"
+                                    placeholder="e.g., Review practice metrics, Update protocols"
                                 />
                                 {goal.trim() && (
                                     <button
                                         onClick={async () => {
                                             const id = await createTask(goal, 'work');
                                             if (id) {
-                                                setAddedGoals(prev => new Set(prev).add(`business-${i}`));
+                                                setAddedGoals(prev => new Set(prev).add(`dental-${i}`));
                                             }
                                         }}
-                                        disabled={addedGoals.has(`business-${i}`)}
-                                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${addedGoals.has(`business-${i}`)
+                                        disabled={addedGoals.has(`dental-${i}`)}
+                                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${addedGoals.has(`dental-${i}`)
                                             ? 'bg-green-900/50 text-green-400 cursor-default'
                                             : 'bg-green-600 hover:bg-green-700 text-white'
                                             }`}
                                     >
-                                        {addedGoals.has(`business-${i}`) ? '✅ Added' : '+ Add to To-Do'}
+                                        {addedGoals.has(`dental-${i}`) ? '✅ Added' : '+ Add to To-Do'}
                                     </button>
                                 )}
                             </div>
                         ))}
                         <button
-                            onClick={() => addGoalField(setBusinessGoals)}
+                            onClick={() => addGoalField(setDentalPracticesGoals)}
                             className="text-sm text-blue-400 hover:text-blue-300"
                         >
                             + Add another goal
@@ -340,48 +346,171 @@ export function PlanningWizard({ onComplete, onCancel, initialPlan, weekOf }: Pl
                     </div>
                 );
 
-            case 5: // Content Creation
+            case 5: // Ryan Smith DDS
                 return (
                     <div className="space-y-4">
-                        <p className="text-gray-400">Plan your content for the week: 2 YouTube videos and 5 shorts.</p>
-                        {contentGoals.map((goal, i) => (
+                        <p className="text-gray-400">Personal CE, clinical development, networking.</p>
+                        {ryanSmithDDSGoals.map((goal, i) => (
                             <div key={i} className="flex gap-2">
                                 <input
                                     type="text"
                                     value={goal}
-                                    onChange={(e) => updateGoalField(i, e.target.value, setContentGoals)}
+                                    onChange={(e) => updateGoalField(i, e.target.value, setRyanSmithDDSGoals)}
                                     className="flex-1 bg-gray-950 border border-gray-800 rounded-lg px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
-                                    placeholder="e.g., YouTube: How to Fix Overbite | Short: Quick Flossing Tip"
+                                    placeholder="e.g., Complete dentistry CE, Attend study club"
+                                />
+                                {goal.trim() && (
+                                    <button
+                                        onClick={async () => {
+                                            const id = await createTask(goal, 'work');
+                                            if (id) {
+                                                setAddedGoals(prev => new Set(prev).add(`rsdds-${i}`));
+                                            }
+                                        }}
+                                        disabled={addedGoals.has(`rsdds-${i}`)}
+                                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${addedGoals.has(`rsdds-${i}`)
+                                            ? 'bg-green-900/50 text-green-400 cursor-default'
+                                            : 'bg-green-600 hover:bg-green-700 text-white'
+                                            }`}
+                                    >
+                                        {addedGoals.has(`rsdds-${i}`) ? '✅ Added' : '+ Add to To-Do'}
+                                    </button>
+                                )}
+                            </div>
+                        ))}
+                        <button
+                            onClick={() => addGoalField(setRyanSmithDDSGoals)}
+                            className="text-sm text-blue-400 hover:text-blue-300"
+                        >
+                            + Add another goal
+                        </button>
+                    </div>
+                );
+
+            case 6: // Assisting School
+                return (
+                    <div className="space-y-4">
+                        <p className="text-gray-400">Curriculum development, student coordination, teaching prep.</p>
+                        {assistingSchoolGoals.map((goal, i) => (
+                            <div key={i} className="flex gap-2">
+                                <input
+                                    type="text"
+                                    value={goal}
+                                    onChange={(e) => updateGoalField(i, e.target.value, setAssistingSchoolGoals)}
+                                    className="flex-1 bg-gray-950 border border-gray-800 rounded-lg px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+                                    placeholder="e.g., Prepare week 5 curriculum, Review student progress"
+                                />
+                                {goal.trim() && (
+                                    <button
+                                        onClick={async () => {
+                                            const id = await createTask(goal, 'work');
+                                            if (id) {
+                                                setAddedGoals(prev => new Set(prev).add(`assisting-${i}`));
+                                            }
+                                        }}
+                                        disabled={addedGoals.has(`assisting-${i}`)}
+                                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${addedGoals.has(`assisting-${i}`)
+                                            ? 'bg-green-900/50 text-green-400 cursor-default'
+                                            : 'bg-green-600 hover:bg-green-700 text-white'
+                                            }`}
+                                    >
+                                        {addedGoals.has(`assisting-${i}`) ? '✅ Added' : '+ Add to To-Do'}
+                                    </button>
+                                )}
+                            </div>
+                        ))}
+                        <button
+                            onClick={() => addGoalField(setAssistingSchoolGoals)}
+                            className="text-sm text-blue-400 hover:text-blue-300"
+                        >
+                            + Add another goal
+                        </button>
+                    </div>
+                );
+
+            case 7: // Equity Dental
+                return (
+                    <div className="space-y-4">
+                        <p className="text-gray-400">Strategic initiatives, partnerships, business development.</p>
+                        {equityDentalGoals.map((goal, i) => (
+                            <div key={i} className="flex gap-2">
+                                <input
+                                    type="text"
+                                    value={goal}
+                                    onChange={(e) => updateGoalField(i, e.target.value, setEquityDentalGoals)}
+                                    className="flex-1 bg-gray-950 border border-gray-800 rounded-lg px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+                                    placeholder="e.g., Review partnership proposals, Plan Q1 strategy"
+                                />
+                                {goal.trim() && (
+                                    <button
+                                        onClick={async () => {
+                                            const id = await createTask(goal, 'work');
+                                            if (id) {
+                                                setAddedGoals(prev => new Set(prev).add(`equity-${i}`));
+                                            }
+                                        }}
+                                        disabled={addedGoals.has(`equity-${i}`)}
+                                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${addedGoals.has(`equity-${i}`)
+                                            ? 'bg-green-900/50 text-green-400 cursor-default'
+                                            : 'bg-green-600 hover:bg-green-700 text-white'
+                                            }`}
+                                    >
+                                        {addedGoals.has(`equity-${i}`) ? '✅ Added' : '+ Add to To-Do'}
+                                    </button>
+                                )}
+                            </div>
+                        ))}
+                        <button
+                            onClick={() => addGoalField(setEquityDentalGoals)}
+                            className="text-sm text-blue-400 hover:text-blue-300"
+                        >
+                            + Add another goal
+                        </button>
+                    </div>
+                );
+
+            case 8: // Courses
+                return (
+                    <div className="space-y-4">
+                        <p className="text-gray-400">Content creation, platform maintenance, student support.</p>
+                        {coursesGoals.map((goal, i) => (
+                            <div key={i} className="flex gap-2">
+                                <input
+                                    type="text"
+                                    value={goal}
+                                    onChange={(e) => updateGoalField(i, e.target.value, setCoursesGoals)}
+                                    className="flex-1 bg-gray-950 border border-gray-800 rounded-lg px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
+                                    placeholder="e.g., Record module 3, Update course platform, Answer student questions"
                                 />
                                 {goal.trim() && (
                                     <button
                                         onClick={async () => {
                                             const id = await createTask(goal, 'content');
                                             if (id) {
-                                                setAddedGoals(prev => new Set(prev).add(`content-${i}`));
+                                                setAddedGoals(prev => new Set(prev).add(`courses-${i}`));
                                             }
                                         }}
-                                        disabled={addedGoals.has(`content-${i}`)}
-                                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${addedGoals.has(`content-${i}`)
+                                        disabled={addedGoals.has(`courses-${i}`)}
+                                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${addedGoals.has(`courses-${i}`)
                                             ? 'bg-green-900/50 text-green-400 cursor-default'
                                             : 'bg-green-600 hover:bg-green-700 text-white'
                                             }`}
                                     >
-                                        {addedGoals.has(`content-${i}`) ? '✅ Added' : '+ Add to To-Do'}
+                                        {addedGoals.has(`courses-${i}`) ? '✅ Added' : '+ Add to To-Do'}
                                     </button>
                                 )}
                             </div>
                         ))}
                         <button
-                            onClick={() => addGoalField(setContentGoals)}
+                            onClick={() => addGoalField(setCoursesGoals)}
                             className="text-sm text-blue-400 hover:text-blue-300"
                         >
-                            + Add another item
+                            + Add another goal
                         </button>
                     </div>
                 );
 
-            case 6: // Roadblocks
+            case 9: // Roadblocks
                 return (
                     <div className="space-y-4">
                         <p className="text-gray-400">Review your calendar and identify potential roadblocks or conflicts.</p>
@@ -394,7 +523,7 @@ export function PlanningWizard({ onComplete, onCancel, initialPlan, weekOf }: Pl
                     </div>
                 );
 
-            case 7: // Close & Commit
+            case 10: // Close & Commit
                 return (
                     <div className="space-y-4">
                         {createdTasks.length > 0 && (
