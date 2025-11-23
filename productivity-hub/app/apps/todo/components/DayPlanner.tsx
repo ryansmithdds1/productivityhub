@@ -176,7 +176,7 @@ export function DayPlanner({ date, tasks, onTaskUpdate, onEditTask, onDateChange
                 updatedAt: Date.now(),
             };
 
-            await storage.saveTask(newTask);
+            await storage.createTask(newTask);
             setQuickAddValue('');
             onTaskUpdate(); // Trigger parent component to reload tasks
 
