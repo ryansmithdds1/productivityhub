@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ArrowUpDown, Sparkles, Grid3X3, List } from 'lucide-react';
 import type { YouTubeVideo, SortOption } from '../types';
 import { VideoCard } from './VideoCard';
@@ -16,6 +16,7 @@ interface VideoGridProps {
     onSortChange: (sort: SortOption) => void;
     bookmarkedIds: Set<string>;
     onToggleBookmark: (video: YouTubeVideo) => void;
+    onFormatFilterChange?: (filter: VideoFormatFilter) => void;
 }
 
 export function VideoGrid({
@@ -25,10 +26,19 @@ export function VideoGrid({
     onSortChange,
     bookmarkedIds,
     onToggleBookmark,
+    onFormatFilterChange,
 }: VideoGridProps) {
     const [showTopOnly, setShowTopOnly] = useState(false);
     const [formatFilter, setFormatFilter] = useState<VideoFormatFilter>('all');
     const [viewMode, setViewMode] = useState<ViewMode>('grid');
+
+    // Handle format filter changes
+    const handleFormatFilterChange = (filter: VideoFormatFilter) => {
+        setFormatFilter(filter);
+        if (onFormatFilterChange) {
+            onFormatFilterChange(filter);
+        }
+    };
 
     // Helper to determine if a video is a short (under 60 seconds)
     const isShort = (video: YouTubeVideo): boolean => {
@@ -50,7 +60,7 @@ export function VideoGrid({
         return true; // 'all'
     });
 
-    // Client-side sorting for engagement and views/day
+    // Client-side sorting
     const sortedVideos = [...formatFilteredVideos].sort((a, b) => {
         if (sortBy === 'engagementRate') {
             const metricsA = calculateMetrics(a);
@@ -62,7 +72,13 @@ export function VideoGrid({
             const metricsB = calculateMetrics(b);
             return metricsB.viewsPerDay - metricsA.viewsPerDay;
         }
-        // For viewCount and relevance, already sorted by API
+        if (sortBy === 'viewCount') {
+            return b.viewCount - a.viewCount;
+        }
+        if (sortBy === 'date') {
+            return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime();
+        }
+        // For relevance, keep API order
         return 0;
     });
 
@@ -131,7 +147,7 @@ export function VideoGrid({
                     {!showTopOnly && (
                         <div className="flex items-center gap-1 bg-gray-900 border border-gray-700 rounded-lg p-1">
                             <button
-                                onClick={() => setFormatFilter('all')}
+                                onClick={() => handleFormatFilterChange('all')}
                                 className={`px-3 py-1 rounded-md text-xs font-medium transition-all ${formatFilter === 'all'
                                     ? 'bg-blue-500 text-white'
                                     : 'text-gray-400 hover:text-gray-200'
@@ -140,7 +156,7 @@ export function VideoGrid({
                                 All
                             </button>
                             <button
-                                onClick={() => setFormatFilter('shorts')}
+                                onClick={() => handleFormatFilterChange('shorts')}
                                 className={`px-3 py-1 rounded-md text-xs font-medium transition-all ${formatFilter === 'shorts'
                                     ? 'bg-blue-500 text-white'
                                     : 'text-gray-400 hover:text-gray-200'
@@ -149,7 +165,7 @@ export function VideoGrid({
                                 Shorts
                             </button>
                             <button
-                                onClick={() => setFormatFilter('long')}
+                                onClick={() => handleFormatFilterChange('long')}
                                 className={`px-3 py-1 rounded-md text-xs font-medium transition-all ${formatFilter === 'long'
                                     ? 'bg-blue-500 text-white'
                                     : 'text-gray-400 hover:text-gray-200'

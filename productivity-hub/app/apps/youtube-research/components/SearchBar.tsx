@@ -96,8 +96,8 @@ export function SearchBar({ onSearch, isLoading, recentSearches }: SearchBarProp
                         type="button"
                         onClick={() => setShowFilters(!showFilters)}
                         className={`px-4 py-2 rounded-lg font-medium transition-all inline-flex items-center gap-2 ${showFilters
-                                ? 'bg-red-500/20 text-red-400 border border-red-500/30'
-                                : 'bg-gray-800 hover:bg-gray-700 text-gray-300 border border-gray-700'
+                            ? 'bg-red-500/20 text-red-400 border border-red-500/30'
+                            : 'bg-gray-800 hover:bg-gray-700 text-gray-300 border border-gray-700'
                             }`}
                     >
                         <SlidersHorizontal size={18} />
@@ -141,9 +141,8 @@ export function SearchBar({ onSearch, isLoading, recentSearches }: SearchBarProp
                                 className="w-full px-3 py-2 bg-gray-950 border border-gray-700 rounded-lg text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
                             >
                                 <option value="any">Any Duration</option>
-                                <option value="short">Short (&lt; 4 min)</option>
-                                <option value="medium">Medium (4-20 min)</option>
-                                <option value="long">Long (&gt; 20 min)</option>
+                                <option value="short">Under 4 min</option>
+                                <option value="medium">Over 4 min</option>
                             </select>
                         </div>
 

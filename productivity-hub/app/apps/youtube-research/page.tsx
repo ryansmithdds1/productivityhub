@@ -23,6 +23,7 @@ export default function YouTubeResearchApp() {
     const [recentSearches, setRecentSearches] = useState<string[]>([]);
     const [currentSort, setCurrentSort] = useState<SortOption>('relevance');
     const [lastQuery, setLastQuery] = useState('');
+    const [lastFilters, setLastFilters] = useState<SearchFilters | null>(null);
 
     // Load initial data
     useEffect(() => {
@@ -56,6 +57,7 @@ export default function YouTubeResearchApp() {
         setIsLoading(true);
         setError(null);
         setLastQuery(query);
+        setLastFilters(filters);
 
         try {
             const api = new YouTubeAPI(apiKey);
@@ -84,6 +86,19 @@ export default function YouTubeResearchApp() {
         } finally {
             setIsLoading(false);
         }
+    };
+
+    // Handle format filter changes - auto-fetch more results
+    const handleFormatFilterChange = async (filter: 'all' | 'shorts' | 'long') => {
+        if (!lastQuery || !lastFilters || filter === 'all') return;
+
+        // When filtering by format, fetch 2x maxResults to get enough videos after filtering
+        const increasedFilters = {
+            ...lastFilters,
+            maxResults: Math.min(lastFilters.maxResults * 2, 50), // Cap at 50 (YouTube API limit)
+        };
+
+        await handleSearch(lastQuery, increasedFilters);
     };
 
     const handleToggleBookmark = async (video: YouTubeVideo) => {
@@ -156,8 +171,8 @@ export default function YouTubeResearchApp() {
                     <button
                         onClick={() => setActiveTab('search')}
                         className={`px-4 py-3 font-medium transition-all relative ${activeTab === 'search'
-                                ? 'text-red-400'
-                                : 'text-gray-400 hover:text-gray-200'
+                            ? 'text-red-400'
+                            : 'text-gray-400 hover:text-gray-200'
                             }`}
                     >
                         <div className="flex items-center gap-2">
@@ -172,8 +187,8 @@ export default function YouTubeResearchApp() {
                     <button
                         onClick={() => setActiveTab('saved')}
                         className={`px-4 py-3 font-medium transition-all relative ${activeTab === 'saved'
-                                ? 'text-red-400'
-                                : 'text-gray-400 hover:text-gray-200'
+                            ? 'text-red-400'
+                            : 'text-gray-400 hover:text-gray-200'
                             }`}
                     >
                         <div className="flex items-center gap-2">
@@ -188,8 +203,8 @@ export default function YouTubeResearchApp() {
                     <button
                         onClick={() => setActiveTab('settings')}
                         className={`px-4 py-3 font-medium transition-all relative ${activeTab === 'settings'
-                                ? 'text-red-400'
-                                : 'text-gray-400 hover:text-gray-200'
+                            ? 'text-red-400'
+                            : 'text-gray-400 hover:text-gray-200'
                             }`}
                     >
                         <div className="flex items-center gap-2">
@@ -257,6 +272,7 @@ export default function YouTubeResearchApp() {
                                 onSortChange={setCurrentSort}
                                 bookmarkedIds={bookmarkedIds}
                                 onToggleBookmark={handleToggleBookmark}
+                                onFormatFilterChange={handleFormatFilterChange}
                             />
                         )}
 
