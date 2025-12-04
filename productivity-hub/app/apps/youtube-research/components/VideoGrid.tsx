@@ -31,6 +31,12 @@ export function VideoGrid({
     const [showTopOnly, setShowTopOnly] = useState(false);
     const [formatFilter, setFormatFilter] = useState<VideoFormatFilter>('all');
     const [viewMode, setViewMode] = useState<ViewMode>('grid');
+    const [originalOrder, setOriginalOrder] = useState<string[]>([]);
+
+    // Update original order when videos change
+    useEffect(() => {
+        setOriginalOrder(videos.map(v => v.id));
+    }, [videos]);
 
     // Handle format filter changes
     const handleFormatFilterChange = (filter: VideoFormatFilter) => {
@@ -78,8 +84,10 @@ export function VideoGrid({
         if (sortBy === 'date') {
             return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime();
         }
-        // For relevance, keep API order
-        return 0;
+        // For relevance, restore original API order
+        const indexA = originalOrder.indexOf(a.id);
+        const indexB = originalOrder.indexOf(b.id);
+        return indexA - indexB;
     });
 
     // Get top 5 or all videos based on filter (from format-filtered set)
