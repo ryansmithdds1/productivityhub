@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Calendar, Zap, Settings, User, LogOut, ListTodo, Users, ExternalLink, Dumbbell, Apple, Heart, Search, Folder, Instagram, TrendingUp, Flame, Headphones, Lightbulb } from 'lucide-react';
+import { LayoutDashboard, Calendar, Zap, Settings, User, LogOut, ListTodo, Users, ExternalLink, Dumbbell, Apple, Heart, Search, Folder, Instagram, TrendingUp, Flame, Headphones, Lightbulb, Youtube } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface NavItem {
@@ -19,6 +19,7 @@ const navItems: NavItem[] = [
     { name: 'Weekly Planning', href: '/apps/weekly-planning', icon: Calendar },
     { name: 'Content Calendar', href: '/apps/content-calendar', icon: Calendar },
     { name: 'Short Video Creator', href: '/apps/hookpoint', icon: Zap },
+    { name: 'YouTube Research', href: '/apps/youtube-research', icon: Youtube },
     { name: 'Workout Tracker', href: '/apps/workout', icon: Dumbbell },
     { name: 'Diet Tracker', href: '/apps/diet', icon: Apple },
     { name: 'Habit Heatmap', href: '/apps/habits', icon: Flame },
