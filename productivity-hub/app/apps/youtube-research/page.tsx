@@ -21,7 +21,7 @@ export default function YouTubeResearchApp() {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [recentSearches, setRecentSearches] = useState<string[]>([]);
-    const [currentSort, setCurrentSort] = useState<SortOption>('relevance');
+    const [currentSort, setCurrentSort] = useState<SortOption>('viewsPerDay');
     const [lastQuery, setLastQuery] = useState('');
     const [lastFilters, setLastFilters] = useState<SearchFilters | null>(null);
 

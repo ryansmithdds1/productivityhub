@@ -14,7 +14,7 @@ export function SearchBar({ onSearch, isLoading, recentSearches }: SearchBarProp
     const [showSuggestions, setShowSuggestions] = useState(false);
 
     const [filters, setFilters] = useState<SearchFilters>({
-        sortBy: 'relevance',
+        sortBy: 'viewsPerDay',
         duration: 'any',
         maxResults: 25,
     });
