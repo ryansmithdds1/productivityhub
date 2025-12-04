@@ -76,7 +76,7 @@ export type SortOption =
     | 'viewsPerDay'
     | 'date';
 
-export type DurationFilter = 'any' | 'short' | 'medium' | 'long';
+export type DurationFilter = 'any' | 'short' | 'medium' | 'long' | 'over4min';
 
 export interface SearchFilters {
     sortBy: SortOption;

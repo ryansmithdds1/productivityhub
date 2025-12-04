@@ -40,8 +40,8 @@ export class YouTubeAPI {
             key: this.apiKey,
         });
 
-        // Add duration filter if not 'any'
-        if (filters.duration !== 'any') {
+        // Add duration filter if not 'any' or 'over4min'
+        if (filters.duration !== 'any' && filters.duration !== 'over4min') {
             params.append('videoDuration', durationMap[filters.duration]);
         }
 
@@ -73,10 +73,25 @@ export class YouTubeAPI {
             // Fetch detailed statistics for all videos
             const videos = await this.getVideoStatistics(videoIds);
 
-            // Client-side filtering by min views
+            // Client-side filtering
             let filteredVideos = videos;
+
+            // Filter by min views
             if (filters.minViews && filters.minViews > 0) {
-                filteredVideos = videos.filter(v => v.viewCount >= filters.minViews!);
+                filteredVideos = filteredVideos.filter(v => v.viewCount >= filters.minViews!);
+            }
+
+            // Filter for "Over 4 min" (exclude shorts)
+            if (filters.duration === 'over4min') {
+                filteredVideos = filteredVideos.filter(v => {
+                    const match = v.duration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+                    if (!match) return false;
+                    const hours = parseInt(match[1] || '0');
+                    const minutes = parseInt(match[2] || '0');
+                    const seconds = parseInt(match[3] || '0');
+                    const totalSeconds = hours * 3600 + minutes * 60 + seconds;
+                    return totalSeconds >= 240; // 4 minutes = 240 seconds
+                });
             }
 
             return filteredVideos;

@@ -142,7 +142,7 @@ export function SearchBar({ onSearch, isLoading, recentSearches }: SearchBarProp
                             >
                                 <option value="any">Any Duration</option>
                                 <option value="short">Under 4 min</option>
-                                <option value="medium">Over 4 min</option>
+                                <option value="over4min">Over 4 min</option>
                             </select>
                         </div>
 
