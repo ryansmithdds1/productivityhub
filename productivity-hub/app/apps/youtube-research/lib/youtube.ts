@@ -32,11 +32,15 @@ export class YouTubeAPI {
         };
 
         // Build search query parameters
+        // If filtering for "Over 4 min", we need to fetch more results (max 50)
+        // because many results will be filtered out client-side (shorts)
+        const fetchLimit = filters.duration === 'over4min' ? 50 : filters.maxResults;
+
         const params = new URLSearchParams({
             part: 'snippet',
             q: query,
             type: 'video',
-            maxResults: filters.maxResults.toString(),
+            maxResults: fetchLimit.toString(),
             key: this.apiKey,
         });
 
@@ -94,7 +98,8 @@ export class YouTubeAPI {
                 });
             }
 
-            return filteredVideos;
+            // Respect the original maxResults limit
+            return filteredVideos.slice(0, filters.maxResults);
         } catch (error: any) {
             console.error('YouTube search error:', error);
             throw error;
