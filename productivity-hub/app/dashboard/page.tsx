@@ -38,16 +38,10 @@ export default async function DashboardPage() {
                 <RoutineGrid />
 
                 {/* YouTube Stats */}
-                <YouTubeStats
-                    channelId="UCH8ogybb7nap82QuKpnpbZg"
-                    apiKey="AIzaSyC8OSuZfHmCrjbH8RIPG-fM7Oq1kho7q_4"
-                />
+                <YouTubeStats />
 
                 {/* Latest Videos */}
-                <YouTubeLatestVideos
-                    channelId="UCH8ogybb7nap82QuKpnpbZg"
-                    apiKey="AIzaSyC8OSuZfHmCrjbH8RIPG-fM7Oq1kho7q_4"
-                />
+                <YouTubeLatestVideos />
             </div>
         </DashboardLayout>
     );
